@@ -1,0 +1,13 @@
+<div class="col-12 d-flex flex-column h-25">
+  <div class="title-div">
+  <p class="h4">
+    <a [routerLink]="'/workflow-list'">
+      <i class="bi bi-box-arrow-left"></i>
+    </a>
+    Kérdőiv</p>
+  </div>
+  <div class="flex-grow-1 overflow-auto"
+       style="height: 100vh; overflow-y: auto">
+  <survey [model]="model"></survey>
+  </div>
+</div>

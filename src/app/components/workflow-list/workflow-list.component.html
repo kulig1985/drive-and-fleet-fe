@@ -1,0 +1,53 @@
+
+
+        <div class="title-div">
+        <p class="h4">
+          <a [routerLink]="'/workflow-list'">
+          <i class="bi bi-list-task"></i>
+          </a>
+          Feladat lista
+        </p>
+        </div>
+        <div class="scroll-div">
+
+
+          <div ngbAccordion [closeOthers]="true">
+            @for (wf of mockworkflowList; track wf.wfId) {
+              <div ngbAccordionItem [collapsed]="true">
+                <h2 ngbAccordionHeader>
+                  <button ngbAccordionButton>{{ wf.plateNumber }} - - {{wf.partnerCompanyName}}</button>
+                </h2>
+                <div ngbAccordionCollapse>
+                  <div ngbAccordionBody>
+                    <ng-template>
+                      <strong>Használó:</strong>  {{wf.carUserName}}
+                      <br>
+                      <strong>Telefonszám:</strong> {{ wf.carUserPhone }}
+                      <hr class="hr hr-blurry" />
+                      <h5>Utak</h5>
+                      <ul class="list-group">
+                        <li *ngFor="let ride of wf.rides" class="list-group-item">
+                          <strong>Felvétel helye:</strong> {{ ride.rideStartLocation }}
+                          <br>
+                          <strong>Leadás helye:</strong> {{ ride.rideFinishLocation }}
+                          <br>
+                          <strong>Megjegyzés:</strong> {{ ride.comment }}
+                          <br>
+                          <strong>Dátum:</strong> {{ ride.crDate }}
+                          <br>
+                          <a [routerLink]="'/ride-survey'" [queryParams]="{ wfId: wf.wfId, rideId: ride.rideId }">
+                            <i class="bi bi-car-front"></i> Ürlap
+                          </a>
+                        </li>
+                      </ul>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+
+        </div>
+
+
