@@ -1,0 +1,369 @@
+
+
+<c-toaster [placement]="toastPosition" >
+<c-toast [autohide]="true" [visible]="toastVisible" color="success">
+<c-toast-header>
+    Információ
+</c-toast-header>
+    <c-toast-body>
+        <p>{{toastMessage}}</p>
+    </c-toast-body>
+</c-toast>
+</c-toaster>
+
+<c-container>
+<!--    <c-row>-->
+<!--        <c-col>-->
+<!--            <button (click)="toggleNewWorkOrderModal()" cButton color="primary" variant="outline">Új renedlés<svg [cIcon]="icons.cilPlus"></svg> </button>-->
+<!--        </c-col>-->
+<!--        <c-col>-->
+<!--            <button (click)="loadWorkflowData()" cButton color="success" variant="outline"><svg [cIcon]="icons.cilReload"></svg> </button>-->
+<!--        </c-col>-->
+<!--        <c-col>-->
+<!--            <c-form-check>-->
+<!--                <input cFormCheckInput id="checkOne" type="checkbox" />-->
+<!--                <label cFormCheckLabel for="checkOne">Lezártak</label>-->
+<!--            </c-form-check>-->
+<!--        </c-col>-->
+<!--    </c-row>-->
+
+
+    <c-button-group aria-label="Basic mixed styles example" role="group">
+            <button (click)="toggleNewWorkOrderModal()" cButton color="primary" variant="outline">Új renedlés<svg [cIcon]="icons.cilPlus"></svg></button>
+            <button (click)="loadWorkflowData()" cButton color="success" variant="outline">Frissítés<svg [cIcon]="icons.cilReload"></svg> </button>
+        <button (click)="loadWorkflowData()" cButton color="warning" variant="outline">Összes<svg [cIcon]="icons.cilFilter"></svg> </button>
+    </c-button-group>
+
+</c-container>
+
+<!-- New order popup -->
+<dx-popup #newWorkOrderPopup [showCloseButton]="true" [(visible)]="newWorkOrderModalVisible" title="Új megrendelés"
+              width="80%" height="80%" [resizeEnabled]="false" [dragEnabled]="false" (onHiding)="closeNewWorkOrderPopup()">
+
+<!--        <dx-scroll-view-->
+<!--            #scrollView-->
+<!--            class="scrollable-list"-->
+<!--            direction="vertical"-->
+<!--            width="100%"-->
+<!--            height="100%"-->
+<!--        >-->
+
+            <form  (submit)="saveNewWorkOrder($event)">
+                <dx-form #newWorkOrderForm [colCount]="2" [formData]="newWorkOrder" [showValidationSummary]="true">
+                    <dxi-item itemType="group" caption="Rendelési adatok">
+                        <dxi-item dataField="partner.partnerId" editorType="dxLookup"
+                                  [editorOptions]="{items : validPartnerList,
+                                                valueExpr: 'partnerId',
+                                                displayExpr: 'partnerName',
+                                                fullScreen: false,
+                                                dropDownOptions: {fullScreen: false}}">
+                            <dxo-label text="Partner"> </dxo-label>
+                            <dxi-validation-rule type="required" message="Válassz partnert!"/>
+                        </dxi-item>
+                        <dxi-item dataField="plateNr">
+                            <dxo-label text="Rendszám"> </dxo-label>
+                            <dxi-validation-rule type="required" message="Add meg a rendszámot!"/>
+                            <dxi-validation-rule type="pattern" message="Nem megfelelő rendszám formátum" pattern="^[A-Za-z]{3}-?\d{3}$|^[A-Za-z]{4}-?\d{3}$"/>
+                        </dxi-item>
+                        <dxi-item dataField="commentText" editorType="dxTextArea">
+                            <dxo-label text="Megjegyzés"> </dxo-label>
+                            <dxi-validation-rule type="required" message="Add meg a megrendelés nevét!"/>
+                        </dxi-item>
+                        <dxi-item dataField="rideCnt" editorType="dxNumberBox" [editorOptions]="{onValueChanged: rideCntChanged}">
+                            <dxo-label text="Fuvar darabszám"> </dxo-label>
+                            <dxi-validation-rule type="required" message="Add meg a fuvar darabszámot"/>
+                        </dxi-item>
+                    </dxi-item>
+
+
+
+                    <dxi-item itemType="group" caption="Fuvar adatok">
+
+
+                        <dxi-item
+                                itemType="button"
+                                horizontalAlignment="left"
+                                cssClass="add-phone-button"
+                                [buttonOptions]="addRideButtonOption"
+                        >
+                        </dxi-item>
+
+                        <!--<button (click)="copyPlateNr()" cButton>Rendszám másolása <svg [cIcon]="icons.cilPlus"></svg> </button>-->
+
+                            <dxi-item itemType="tabbed" name="rides" >
+
+                                <dxi-tab  [title]="'Fuvar ' + (i + 1)" *ngFor="let ride of newWorkOrder.rides; let i = index">
+                                    <dxi-item
+                                            [dataField]="'rides[' + i + '].relRideDrivers[0].driver.driverId'"
+                                            caption="Sofőr"
+                                            editorType="dxLookup"
+                                            [editorOptions]="{dataSource : driverList,
+                                                      valueExpr: 'driverId',
+                                                       displayExpr: 'driverRealName',
+                                                       fullScreen: false,
+                                                       dropDownOptions: {fullScreen: false}}"
+                                    >
+                                        <dxo-label text="Sofőr"> </dxo-label>
+                                        <dxi-validation-rule type="required" message="Add meg a safőrt!"/>
+                                    </dxi-item>
+                                    <dxi-item
+                                            [dataField]="'rides[' + i + '].carType'"
+                                            caption="Car Type"
+                                    >
+                                        <dxo-label text="Típus"> </dxo-label>
+                                        <dxi-validation-rule type="required" message="Add meg az autó típusát!"/>
+                                    </dxi-item>
+                                    <dxi-item
+                                            [dataField]="'rides[' + i + '].carUserName'"
+                                            caption="Car User Name"
+                                    >
+                                        <dxo-label text="Használó neve"> </dxo-label>
+                                        <dxi-validation-rule type="required" message="Add meg a használó nevét!"/>
+                                    </dxi-item>
+                                    <dxi-item
+                                            [dataField]="'rides[' + i + '].startLocationZip'"
+                                            caption="Start Location Zip"
+                                            editorType="dxNumberBox"
+                                            hint="1032"
+                                    >
+                                        <dxi-validation-rule type="required" message="Add meg a felvétel irányitószámot!"/>
+                                        <dxo-label text="Felvétel irsz."> </dxo-label>
+                                    </dxi-item>
+                                    <dxi-item
+                                            [dataField]="'rides[' + i + '].startLocationCity'"
+                                            caption="Start Location City"
+                                    >
+                                        <dxi-validation-rule type="required" message="Add meg a felvétel várost!"/>
+                                        <dxo-label text="Felvétel Város"> </dxo-label>
+                                    </dxi-item>
+                                    <dxi-item
+                                            [dataField]="'rides[' + i + '].startLocationAddress'"
+                                            caption="Start Location Address"
+                                    >
+                                        <dxo-label text="Felvétel cím"> </dxo-label>
+                                        <dxi-validation-rule type="required" message="Add meg a felvétel címet!"/>
+                                    </dxi-item>
+                                    <dxi-item
+                                            [dataField]="'rides[' + i + '].finishLocationZip'"
+                                            caption="Finish Location Zip"
+                                            editorType="dxNumberBox"
+                                            hint="1032"
+                                    >
+                                        <dxo-label text="Leadás irsz."> </dxo-label>
+                                        <dxi-validation-rule type="required" message="Add meg a leadás irányítószámot!"/>
+                                    </dxi-item>
+                                    <dxi-item
+                                            [dataField]="'rides[' + i + '].finishLocationCity'"
+                                            caption="Finish Location City"
+                                    >
+                                        <dxo-label text="Leadás város"> </dxo-label>
+                                        <dxi-validation-rule type="required" message="Add meg a leadás várost!"/>
+                                    </dxi-item>
+                                    <dxi-item
+                                            [dataField]="'rides[' + i + '].finishLocationAddress'"
+                                            caption="Finish Location Address"
+                                    >
+                                        <dxo-label text="Leadás cím"> </dxo-label>
+                                        <dxi-validation-rule type="required" message="Add meg a leadás címet!"/>
+                                    </dxi-item>
+                                </dxi-tab>
+                            </dxi-item>
+
+
+
+
+                        <dxi-item itemType="button" [buttonOptions]="{text: 'Mentés',type: 'default',width: '120px',useSubmitBehavior: true}">
+                        </dxi-item>
+                    </dxi-item>
+
+                </dx-form>
+            </form>
+<!--        </dx-scroll-view>-->
+
+    </dx-popup>
+<!-- New order popup END-->
+
+<!-- Change plate popup -->
+
+<dx-popup [showCloseButton]="true" [(visible)]="plateChangeModalVisible" title="Rendszám módosítás" height="200">
+
+
+    <form  (submit)="modifyPlateNr($event)">
+        <dx-form #modifyPlateForm [colCount]="2" [formData]="modifyWorkOrder" [showValidationSummary]="true">
+
+            <dxi-item dataField="plateNr">
+                <dxo-label text="Rendszám"> </dxo-label>
+                <dxi-validation-rule type="required" message="Add meg a rendszámot!"/>
+                <dxi-validation-rule type="pattern" message="Nem megfelelő rendszám formátum" pattern="^[A-Za-z]{3}-?\d{3}$|^[A-Za-z]{4}-?\d{3}$"/>
+            </dxi-item>
+
+            <dxi-item itemType="button" [buttonOptions]="{text: 'Mentés',type: 'default',width: '120px',useSubmitBehavior: true}">
+            </dxi-item>
+        </dx-form>
+    </form>
+
+</dx-popup>
+
+<!-- Change plate popup END-->
+
+<hr class="hr" />
+
+
+
+    <div *ngFor="let workOrder of workOrderList; let i = index">
+        <c-card class="mb-3" cBorder="secondary" >
+            <c-card-body>
+                <c-card [ngClass]="{'bg-secondary text-white': expandedWorkOrders[i]}" >
+                    <c-card-header>
+
+                        <div class="d-flex align-items-center justify-content-between">
+                            <h6>ID: {{workOrder.orderId}}</h6>
+                            <h6>{{formatDate(workOrder.crDate, 'long')}}</h6>
+                            <c-dropdown alignment="end" variant="btn-group">
+                                <button [disabled]="!isNotDoneRideOnWorkOrder(workOrder)" [caret]="false" cButton cDropdownToggle class="p-0" color="secondary">
+                                    <svg [cIcon]="icons.cilOptions" class="text-high-emphasis-inverse"></svg>
+                                </button>
+                                <div cDropdownMenu>
+                                    <a (click)="toggleChangePlateModal(i)" cDropdownItem>Rendszám módosítása</a>
+                                </div>
+                            </c-dropdown>
+                        </div>
+                    </c-card-header>
+                    <c-card-body>
+                        <c-row class="justify-content-md-center">
+
+                                <div class="license-plate">
+                                    <div class="eu-flag">H</div>
+                                    <div class="plate-number">{{ workOrder.plateNr }}</div>
+                                </div>
+
+                        </c-row>
+
+
+
+                    </c-card-body>
+                    <c-card-footer>
+                        <a (click)="toggleRides(i)">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span>{{workOrder.partner!.partnerName!}}</span>
+                                <div class="ride-count-div">
+                                    <span class="done-ride">{{doneRideCounter(workOrder)}}/{{workOrder.rides?.length}}</span>
+                                    <svg [cIcon]="isNotDoneRideOnWorkOrder(workOrder) ? icons.cilCarAlt : icons.cilCheck" width="30"></svg>
+                                </div>
+                                <svg [cIcon]="expandedWorkOrders[i] ? icons.cilArrowTop : icons.cilArrowBottom" width="16"></svg>
+                            </div>
+                        </a>
+                    </c-card-footer>
+                </c-card>
+
+                <div [@expandCollapse]="expandedWorkOrders[i] ? 'expanded' : 'collapsed'">
+                    <hr class="hr" />
+                    <div *ngFor="let ride of workOrder.rides; let j = index">
+                        <c-card>
+                        <c-card-header>
+                        <h6>Ride ID: {{ride.rideId}}</h6>
+                        </c-card-header>
+
+                        <c-container class="ride-container">
+                            <c-row [gutter]="{ g: 2 }">
+                                <c-col [md]="3">
+                                    <div cFormFloating class="p-1 border bg-light">
+                                        <input cFormControl id="carType{{i}}{{j}}" type="text" [value]="ride.carType" disabled />
+                                        <label cLabel for="carType{{i}}{{j}}">Megjegyzés</label>
+                                    </div>
+                                </c-col>
+                            </c-row>
+                            <c-row [gutter]="{ g: 2 }">
+                                <c-col >
+                                    <div cFormFloating class="p-1 border bg-light">
+                                        <input cFormControl id="carType{{i}}{{j}}" type="text" [value]="ride.carType" disabled />
+                                        <label cLabel for="carType{{i}}{{j}}">Típus</label>
+                                    </div>
+                                </c-col>
+                                <c-col >
+                                    <div cFormFloating class="p-1 border bg-light">
+                                        <input cFormControl id="carUserName{{i}}{{j}}" type="text" [value]="ride.carUserName" disabled />
+                                        <label cLabel for="carUserName{{i}}{{j}}">Használó</label>
+                                    </div>
+                                </c-col>
+                            </c-row>
+                            <c-row [gutter]="{ g: 2 }">
+                                <c-col [md]="3">
+                                    <div cFormFloating class="p-1 border bg-light">
+                                        <input
+                                                cFormControl
+                                                id="startLoc{{i}}{{j}}"
+                                                type="text"
+                                                [value]="ride.startLocationZip + ', ' + ride.startLocationCity + ' ' + ride.startLocationAddress"
+                                                disabled
+                                        />
+                                        <label cLabel for="startLoc{{i}}{{j}}">Felvétel helye</label>
+                                    </div>
+                                </c-col>
+                            </c-row>
+                            <c-row [gutter]="{ g: 2 }">
+                                <c-col [md]="3">
+                                    <div cFormFloating class="p-1 border bg-light">
+                                        <input
+                                                cFormControl
+                                                id="finishLoc{{i}}{{j}}"
+                                                type="text"
+                                                [value]="ride.finishLocationZip + ', ' + ride.finishLocationCity + ' ' + ride.finishLocationAddress"
+                                                disabled
+                                        />
+                                        <label cLabel for="finishLoc{{i}}{{j}}">Leadás helye</label>
+                                    </div>
+                                </c-col>
+                            </c-row>
+                            <c-row [gutter]="{ g: 2 }">
+                                <c-col>
+                                    <div cFormFloating class="p-1 border bg-light">
+                                        <input
+                                                cFormControl
+                                                id="driverName{{i}}{{j}}"
+                                                type="text"
+                                                [value]="ride.relRideDrivers[0].driver.driverRealName"
+                                                disabled
+                                        />
+                                        <label cLabel for="driverName{{i}}{{j}}">Sofőr neve</label>
+                                    </div>
+                                </c-col>
+                                <c-col>
+                                    <div class="p-1 border bg-light">
+                                        <button [disabled]="!disableRideSurvey(workOrder, ride)" *ngIf="ride.boolId == 1" (click)="openSurvey(workOrder.orderId!, ride.rideId!)" cButton variant="outline" color="danger">
+                                            Ürlap kitöltése
+                                            <svg [cIcon]="icons.cilClipboard"></svg>
+                                        </button>
+                                        <button [disabled]="!disableRideSurvey(workOrder, ride)" *ngIf="ride.boolId == 2" (click)="viewRide(ride.rideId!)" cButton variant="outline" color="success">
+                                            Ürlap megtekintése
+                                            <svg [cIcon]="icons.cilClipboard"></svg>
+                                        </button>
+                                    </div>
+                                </c-col>
+                            </c-row>
+                            <c-row [gutter]="{ g: 2 }" *ngIf="ride.boolId == 2">
+                                <c-col>
+                                <div class="p-1 border bg-light">
+                                    <svg [cIcon]="icons.cilCheck"></svg>
+                                    <strong> Teljesítve: {{ formatDate(ride.modDate, 'long') }} - {{ ride.modUser }}</strong>
+                                </div>
+                                </c-col>
+                            </c-row>
+                        </c-container>
+                        </c-card>
+                    </div>
+                </div>
+            </c-card-body>
+        </c-card>
+    </div>
+
+@if (isLoading) {
+    <div class="centered-div">
+    <dx-load-indicator
+            id="large-indicator"
+            height="60"
+            width="60"
+    ></dx-load-indicator>
+    </div>
+}
+

@@ -1,0 +1,25 @@
+<c-toaster [placement]="toastPosition" >
+    <c-toast [autohide]="true" [visible]="toastVisible" color="success">
+        <c-toast-header>
+            Információ
+        </c-toast-header>
+        <c-toast-body>
+            <p>{{toastMessage}}</p>
+        </c-toast-body>
+    </c-toast>
+</c-toaster>
+
+<div>
+    <c-row class="align-items-center">
+        <c-col>
+            <a [routerLink]="'/home/work-order'">
+                <svg [cIcon]="icons.cilArrowThickFromRight" width="30"></svg> Vissza
+            </a>
+
+        </c-col>
+    </c-row>
+
+    <survey [model]="model"></survey>
+
+</div>
+

@@ -1,0 +1,18 @@
+<c-nav variant="tabs">
+    <a [active]="true" [cTabContent]="tabContent" [routerLink]="" [tabPaneIdx]="0" cNavLink>Megrendelés rögzítése</a>
+    <a [cTabContent]="tabContent" [routerLink] [tabPaneIdx]="1" cNavLink>Sofőr rögzítése</a>
+    <a [cTabContent]="tabContent" [routerLink] [tabPaneIdx]="2" cNavLink>Partner felvétele</a>
+</c-nav>
+<c-tab-content #tabContent="cTabContent">
+    <c-tab-pane class="p-3">
+
+        <survey [model]="model"></survey>
+
+    </c-tab-pane>
+    <c-tab-pane class="p-3">
+
+    </c-tab-pane>
+    <c-tab-pane class="p-3">
+
+    </c-tab-pane>
+</c-tab-content>
