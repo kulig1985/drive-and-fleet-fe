@@ -1,8 +1,8 @@
-import { Component, computed, DestroyRef, inject, Input } from '@angular/core';
+import {Component, computed, DestroyRef, inject, Input, ViewChild} from '@angular/core';
 import {
   AvatarComponent,
   BadgeComponent,
-  BreadcrumbRouterComponent,
+  BreadcrumbRouterComponent, ButtonDirective, ColComponent,
   ColorModeService,
   ContainerComponent,
   DropdownComponent,
@@ -10,38 +10,66 @@ import {
   DropdownHeaderDirective,
   DropdownItemDirective,
   DropdownMenuDirective,
-  DropdownToggleDirective,
+  DropdownToggleDirective, FormControlDirective, FormDirective, GutterDirective,
   HeaderComponent,
   HeaderNavComponent,
-  HeaderTogglerDirective,
+  HeaderTogglerDirective, InputGroupComponent, InputGroupTextDirective,
   NavItemComponent,
   NavLinkDirective,
   ProgressBarDirective,
-  ProgressComponent,
+  ProgressComponent, RowComponent,
   SidebarToggleDirective,
   TextColorDirective,
-  ThemeDirective
+  ThemeDirective, ToasterPlacement
 } from '@coreui/angular';
-import { NgStyle, NgTemplateOutlet } from '@angular/common';
-import { ActivatedRoute, RouterLink, RouterLinkActive } from '@angular/router';
+import {NgForOf, NgIf, NgStyle, NgTemplateOutlet} from '@angular/common';
+import {ActivatedRoute, NavigationEnd, Router, RouterLink, RouterLinkActive} from '@angular/router';
 import { IconDirective } from '@coreui/icons-angular';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { delay, filter, map, tap } from 'rxjs/operators';
 import {AuthService} from "../../../auth/auth.service";
+import {FormsModule} from "@angular/forms";
+import {
+  cilArrowBottom,
+  cilArrowRight,
+  cilArrowTop, cilCarAlt,
+  cilChartPie,
+  cilCheck, cilClipboard, cilFilter, cilOptions,
+  cilPlus, cilReload,
+  cilSpeedometer
+} from "@coreui/icons";
+import {DxFormComponent, DxFormModule, DxPopupModule} from "devextreme-angular";
+import {DxiItemModule, DxiTabModule, DxiValidationRuleModule, DxoLabelModule} from "devextreme-angular/ui/nested";
+import {DriverDTO, PartnerDTO, WorkOrderDTO} from "../../../views/work-order/dto/new-work-order-dto";
+import {DaoService} from "../../../shared/dao.service";
+import {DxButtonTypes} from "devextreme-angular/ui/button";
+import {TriggerService} from "../../../shared/trigger.service";
 
 @Component({
   selector: 'app-default-header',
   templateUrl: './default-header.component.html',
   standalone: true,
-  imports: [ContainerComponent, HeaderTogglerDirective, SidebarToggleDirective, IconDirective, HeaderNavComponent, NavItemComponent, NavLinkDirective, RouterLink, RouterLinkActive, NgTemplateOutlet, BreadcrumbRouterComponent, ThemeDirective, DropdownComponent, DropdownToggleDirective, TextColorDirective, AvatarComponent, DropdownMenuDirective, DropdownHeaderDirective, DropdownItemDirective, BadgeComponent, DropdownDividerDirective, ProgressBarDirective, ProgressComponent, NgStyle]
+  imports: [ContainerComponent, HeaderTogglerDirective, SidebarToggleDirective, IconDirective, HeaderNavComponent, NavItemComponent, NavLinkDirective, RouterLink, RouterLinkActive, NgTemplateOutlet, BreadcrumbRouterComponent, ThemeDirective, DropdownComponent, DropdownToggleDirective, TextColorDirective, AvatarComponent, DropdownMenuDirective, DropdownHeaderDirective, DropdownItemDirective, BadgeComponent, DropdownDividerDirective, ProgressBarDirective, ProgressComponent, NgStyle, FormDirective, FormControlDirective, ButtonDirective, FormsModule, RowComponent, GutterDirective, ColComponent, InputGroupTextDirective, InputGroupComponent, NgIf, DxFormModule, DxPopupModule, DxiItemModule, DxiTabModule, DxiValidationRuleModule, DxoLabelModule, NgForOf]
 })
-export class DefaultHeaderComponent extends HeaderComponent {
+export class DefaultHeaderComponent  extends HeaderComponent  {
 
   readonly #activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   readonly #colorModeService = inject(ColorModeService);
   readonly colorMode = this.#colorModeService.colorMode;
   readonly #destroyRef: DestroyRef = inject(DestroyRef);
   isAdmin = false;
+  plateSearchText = '';
+  showHeader = false;
+  newWorkOrderModalVisible = false;
+  newWorkOrder: WorkOrderDTO;
+  @ViewChild('newWorkOrderForm') newWorkOrderForm: DxFormComponent;
+  isLoading = false;
+  toastVisible = false;
+  toastPosition = ToasterPlacement.TopCenter;
+  toastMessage = '';
+  validPartnerList : PartnerDTO[];
+  driverList : DriverDTO[];
+  iconsAll = { cilCheck, cilPlus, cilArrowRight, cilChartPie, cilSpeedometer, cilArrowBottom, cilArrowTop, cilCarAlt, cilReload, cilOptions, cilClipboard, cilFilter};
 
   readonly colorModes = [
     { name: 'light', text: 'Light', icon: 'cilSun' },
@@ -54,9 +82,12 @@ export class DefaultHeaderComponent extends HeaderComponent {
     return this.colorModes.find(mode=> mode.name === currentMode)?.icon ?? 'cilSun';
   });
 
-  constructor(authService: AuthService) {
+  constructor(authService: AuthService,
+              router: Router,
+              private daoService: DaoService,
+              private triggerService: TriggerService) {
     super();
-    this.#colorModeService.localStorageItemName.set('coreui-free-angular-admin-template-theme-default');
+    this.#colorModeService.localStorageItemName.set('drive-and-fleet-theme-default');
     this.#colorModeService.eventName.set('ColorSchemeChange');
 
     this.#activatedRoute.queryParams
@@ -73,7 +104,25 @@ export class DefaultHeaderComponent extends HeaderComponent {
 
     this.isAdmin = authService.isUserAdmin();
 
+    router.events
+        .pipe(filter(event => event instanceof NavigationEnd))
+        .subscribe(() => {
+          console.log('header url', router.url)
+          this.showHeader = router.url === '/home/work-order';
+        });
+
+
   }
+
+  toggleNewWorkOrderModal() {
+        this.triggerService.triggerOpenNewOrderPopup()
+  }
+
+  onPlateSearchTextChange(newValue: string) {
+    this.triggerService.triggerSearchTextChanged(newValue);
+
+  }
+
 
   @Input() sidebarId: string = 'sidebar1';
 

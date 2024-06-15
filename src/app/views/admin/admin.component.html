@@ -1,18 +1,9 @@
-<c-nav variant="tabs">
-    <a [active]="true" [cTabContent]="tabContent" [routerLink]="" [tabPaneIdx]="0" cNavLink>Megrendelés rögzítése</a>
-    <a [cTabContent]="tabContent" [routerLink] [tabPaneIdx]="1" cNavLink>Sofőr rögzítése</a>
-    <a [cTabContent]="tabContent" [routerLink] [tabPaneIdx]="2" cNavLink>Partner felvétele</a>
-</c-nav>
-<c-tab-content #tabContent="cTabContent">
-    <c-tab-pane class="p-3">
 
-        <survey [model]="model"></survey>
 
-    </c-tab-pane>
-    <c-tab-pane class="p-3">
+<dx-data-grid [dataSource]="allRidesList" [showBorders]="true" [showRowLines]="true" [columnHidingEnabled]="true">
 
-    </c-tab-pane>
-    <c-tab-pane class="p-3">
+    <dxo-header-filter [visible]="true" [allowSearch]="true"></dxo-header-filter>
+    <dxo-sorting mode="multiple"></dxo-sorting>
+    <dxo-column-chooser [enabled]="true" mode="select"></dxo-column-chooser>
 
-    </c-tab-pane>
-</c-tab-content>
+</dx-data-grid>

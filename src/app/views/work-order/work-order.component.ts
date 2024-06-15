@@ -2,7 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {
     AccordionButtonDirective,
     AccordionComponent,
-    AccordionItemComponent, AlertComponent, BorderDirective,
+    AccordionItemComponent, AlertComponent, BadgeComponent, BorderDirective,
     ButtonCloseDirective,
     ButtonDirective, ButtonGroupComponent,
     CardBodyComponent,
@@ -26,7 +26,7 @@ import {
     FormFloatingDirective,
     FormLabelDirective,
     FormTextDirective,
-    GutterDirective,
+    GutterDirective, InputGroupComponent, InputGroupTextDirective,
     ModalBodyComponent,
     ModalComponent,
     ModalFooterComponent,
@@ -68,6 +68,8 @@ import {
     cilFilter
 } from "@coreui/icons";
 import {
+    DxAccordionComponent,
+    DxAccordionModule,
     DxButtonModule,
     DxFormComponent,
     DxFormModule,
@@ -78,9 +80,12 @@ import {
     DxTabPanelModule,
 } from "devextreme-angular";
 import {DxButtonTypes} from "devextreme-angular/ui/button";
-import {ReactiveFormsModule, UntypedFormBuilder} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule, UntypedFormBuilder} from "@angular/forms";
 import {DriverDTO, PartnerDTO, RideDTO, WorkOrderDTO} from "./dto/new-work-order-dto";
 import {animate, state, style, transition, trigger} from '@angular/animations';
+import {PlateFilterPipe} from "./plate-filter.pipe";
+import {TriggerService} from "../../shared/trigger.service";
+import {Subscription} from "rxjs";
 
 
 @Component({
@@ -148,7 +153,13 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
         CardFooterComponent,
         BorderDirective,
         AlertComponent,
-        ButtonGroupComponent
+        ButtonGroupComponent,
+        InputGroupComponent,
+        InputGroupTextDirective,
+        PlateFilterPipe,
+        FormsModule,
+        BadgeComponent,
+        DxAccordionModule
     ],
   providers: [DatePipe],
   templateUrl: './work-order.component.html',
@@ -165,6 +176,7 @@ export class WorkOrderComponent implements OnInit{
 
   icons = { cilCheck, cilPlus, cilArrowRight, cilChartPie, cilSpeedometer, cilArrowBottom, cilArrowTop, cilCarAlt, cilReload, cilOptions, cilClipboard, cilFilter};
   workOrderList: WorkOrderDTO[];
+  filteredWorkOrderList: WorkOrderDTO[];
   newWorkOrder: WorkOrderDTO;
   modifyWorkOrder: WorkOrderDTO;
   newWorkOrderModalVisible = false;
@@ -180,6 +192,12 @@ export class WorkOrderComponent implements OnInit{
   @ViewChild('newWorkOrderForm') newWorkOrderForm: DxFormComponent;
   @ViewChild('newWorkOrderPopup') newWorkOrderPopup: DxFormComponent;
   @ViewChild('scrollView') scrollView: DxScrollViewComponent;
+  @ViewChild('workOrderListAccordion') workOrderListAccordion: DxAccordionComponent;
+
+  plateSearchText = '';
+    idCaption: 'id';
+  triggerOpenNewOrderPopupSubscripton: Subscription;
+  triggerSearchTextChangedSubscripton: Subscription;
 
 
   addRideButtonOption: DxButtonTypes.Properties = {
@@ -187,11 +205,10 @@ export class WorkOrderComponent implements OnInit{
       text: 'Fuvar hozzáadása',
       onClick: () => {
           this.newWorkOrder.rides?.push({
-              carType: null,
-              carUserName: null,
               finishLocationAddress: null,
               finishLocationCity: null,
               executeNr: this.newWorkOrder.rides?.length + 1,
+              pickUpTime:null,
               relRideDrivers: [],
               startLocationAddress: null,
               startLocationCity: null,
@@ -203,7 +220,8 @@ export class WorkOrderComponent implements OnInit{
 
   constructor(private daoService: DaoService,
               private router: Router,
-              private datePipe: DatePipe) {
+              private datePipe: DatePipe,
+              private triggerService: TriggerService) {
       this.newWorkOrder = {partner: {}, rideCnt: null, rides: []};
       this.rideCntChanged = this.rideCntChanged.bind(this);
       this.scrollDown = this.scrollDown.bind(this);
@@ -236,6 +254,19 @@ export class WorkOrderComponent implements OnInit{
           }
       )
 
+      this.triggerOpenNewOrderPopupSubscripton = this.triggerService.triggerOpenNewOrderPopupFunctionObservable.subscribe(() => {
+
+          this.newWorkOrderModalVisible = true;
+
+      });
+
+      this.triggerSearchTextChangedSubscripton = this.triggerService.triggerSearchTextChangedFunctionObservable.subscribe((newValue: string) => {
+          console.log('emitted: ', newValue)
+          this.filteredWorkOrderList = this.workOrderList.filter(workOrder => workOrder.plateNr?.toLowerCase().includes(newValue.toLowerCase()));
+
+
+      });
+
 
 
 
@@ -248,6 +279,7 @@ export class WorkOrderComponent implements OnInit{
                 next: (workOrders: any) => {
                     console.log('workOrders', workOrders);
                     this.workOrderList = workOrders;
+                    this.filteredWorkOrderList = this.workOrderList;
                     this.expandedWorkOrders = new Array(this.workOrderList.length).fill(false);
                     this.isLoading = false;
                 },
@@ -295,12 +327,18 @@ export class WorkOrderComponent implements OnInit{
         //this.newWorkOrderForm.instance.clear();
     }
 
-    toggleChangePlateModal(index : number) {
-        const orderId = this.workOrderList[index].orderId;
-        const plateNr = this.workOrderList[index].plateNr;
+    toggleChangePlateModal(e: any, workOrder: WorkOrderDTO) {
+        e.event.stopPropagation();
+        console.log('toggleChangePlateModal', workOrder)
+        const orderId = workOrder.orderId;
+        const plateNr = workOrder.plateNr;
         this.modifyWorkOrder = {orderId, plateNr};
         console.log('modifyWorkOrder:', this.modifyWorkOrder)
         this.plateChangeModalVisible = !this.plateChangeModalVisible;
+    }
+
+    toggleChangeDriverModal(e:any, workOrder: WorkOrderDTO) {
+        e.event.stopPropagation();
     }
 
     closeNewWorkOrderPopup() {
@@ -315,11 +353,10 @@ export class WorkOrderComponent implements OnInit{
       for (let i = 1; i <= rideCntToCreate; i++) {
 
           this.newWorkOrder.rides?.push({
-              carType: null,
-              carUserName: null,
               finishLocationAddress: null,
               finishLocationCity: null,
               executeNr: this.newWorkOrder.rides?.length + 1,
+              pickUpTime: null,
               relRideDrivers: [],
               startLocationAddress: null,
               startLocationCity: null,
@@ -399,7 +436,10 @@ export class WorkOrderComponent implements OnInit{
     }
 
     disableRideSurvey(workOrder: WorkOrderDTO, currentRide: RideDTO): boolean {
-        return !workOrder.rides!.some(
+        if (workOrder.rides?.length == 1) {
+            return true;
+        }
+        return workOrder.rides!.some(
             (ride) =>
                 ride.executeNr > currentRide.executeNr &&
                 ride.boolId === 1 &&
@@ -411,7 +451,10 @@ export class WorkOrderComponent implements OnInit{
         return workOrder.rides?.filter(ride => ride.boolId == 2).length
     }
 
+    rideSelected(e: any){
+      console.log('rideSelected', e);
+    }
 
 
-
+    protected readonly JSON = JSON;
 }

@@ -10,5 +10,6 @@ export const environment = {
     modifyWorkOrder: "api/modifyWorkOrder",
     findRideById: "api/dao/findRideById",
     downloadPicture: "api/downloadPicture",
+    findAllRide: "api/dao/findAllRide",
 
 }

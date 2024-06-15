@@ -8,76 +8,95 @@
         </c-col>
     </c-row>
 
-    <c-card>
-        <c-card-body>
-            <h5 cCardTitle>id: {{ loadedRide?.rideId }}</h5>
-            <h6 cCardSubtitle class="mb-2 text-medium-emphasis">
-            </h6>
-            <hr>
+    <div class="centered-div" *ngIf="loadedRide == undefined">
+        <dx-load-indicator
+                id="large-indicator"
+                height="60"
+                width="60"
+        ></dx-load-indicator>
+    </div>
 
-            <c-container class="px-4" *ngIf="loadedRide">
-                Alap információk
-                <c-row [gutter]="{gx: 2}">
-                    <c-col>
-                        <div cFormFloating class="p-1 border bg-light">
-                            <input class="smaller-font" cFormControl id="orderId" type="text" [value]="loadedRide?.order?.orderId" disabled />
-                            <label cLabel for="orderId">ID</label>
-                        </div>
-                    </c-col>
-                    <c-col>
-                        <div cFormFloating class="p-1 border bg-light">
-                            <input class="smaller-font" cFormControl id="plateNr" type="text" [value]="loadedRide?.order?.plateNr" disabled />
-                            <label cLabel for="plateNr">Rendszám</label>
-                        </div>
-                    </c-col>
-                </c-row>
+    <c-nav variant="tabs">
+        <a [active]="activeTab === 0" (click)="setActiveTab(0)" [cTabContent]="tabContent"  [tabPaneIdx]="0" cNavLink>Jegyzőkönyv</a>
+        <a [active]="activeTab === 1" (click)="setActiveTab(1)" [cTabContent]="tabContent"  [tabPaneIdx]="1" cNavLink>Fényképek</a>
+    </c-nav>
+    <c-tab-content #tabContent="cTabContent">
+        <c-tab-pane class="p-3">
+            <c-card *ngIf="loadedRide != undefined">
+                <c-card-body>
+                    <h5 cCardTitle>id: {{ loadedRide?.rideId }}</h5>
+                    <h6 cCardSubtitle class="mb-2 text-medium-emphasis">
+                    </h6>
+                    <hr>
 
-                <c-row [gutter]="{gx: 2}">
-                    <c-col>
-                        <div cFormFloating class="p-1 border bg-light">
-                            <input class="smaller-font" cFormControl id="pickupLoc" type="text" [value]="loadedRide?.startLocationZip + ', ' + loadedRide?.startLocationCity + ' ' + loadedRide?.startLocationAddress" disabled />
-                            <label cLabel for="pickupLoc">Felvéve</label>
-                        </div>
-                    </c-col>
-                    <c-col>
-                        <div cFormFloating class="p-1 border bg-light">
-                            <input class="smaller-font" cFormControl id="dropLoc" type="text" [value]="loadedRide?.finishLocationZip + ', ' + loadedRide?.finishLocationCity + ' ' + loadedRide?.finishLocationAddress" disabled />
-                            <label cLabel for="dropLoc">Leadva</label>
-                        </div>
-                    </c-col>
-                </c-row>
+                    <c-container class="px-4" >
+                        Alap információk
+                        <c-row [gutter]="{gx: 2}">
+                            <c-col>
+                                <div cFormFloating class="p-1 border bg-light">
+                                    <input class="smaller-font" cFormControl id="orderId" type="text" [value]="loadedRide?.order?.orderId" disabled />
+                                    <label cLabel for="orderId">ID</label>
+                                </div>
+                            </c-col>
+                            <c-col>
+                                <div cFormFloating class="p-1 border bg-light">
+                                    <input class="smaller-font" cFormControl id="plateNr" type="text" [value]="loadedRide?.order?.plateNr" disabled />
+                                    <label cLabel for="plateNr">Rendszám</label>
+                                </div>
+                            </c-col>
+                        </c-row>
 
-                <c-row [gutter]="{gx: 2}">
-                    <c-col>
-                        <div cFormFloating class="p-1 border bg-light">
-                            <input class="smaller-font" cFormControl id="driverRealName" type="text" [value]="loadedRide!.relRideDrivers[0]!.driver.driverRealName!" disabled />
-                            <label cLabel for="driverRealName">Sofőr</label>
-                        </div>
-                    </c-col>
-                    <c-col>
-                        <div cFormFloating class="p-1 border bg-light ">
-                            <input class="smaller-font" cFormControl id="modDate" type="text" [value]="formatDate(loadedRide!.modDate!, 'long')" disabled />
-                            <label cLabel for="modDate">Lezárva</label>
-                        </div>
-                    </c-col>
-                </c-row>
-                <hr>
-                Jegyzőkönyv adatok
-                <c-row [gutter]="{gx: 1}" *ngFor="let surveyResult of loadedRide.rideSurveyResults; let i = index">
-                    <c-col >
-                        <div cFormFloating class="p-1 border bg-light ">
-                            <input class="smaller-font" cFormControl id="{{ surveyResult.stype.typeName }}_{{i}}" type="text" [value]="surveyResult.survValue" disabled />
-                            <label cLabel for="modDate">{{ surveyResult.stype.typeName }}</label>
-                        </div>
-                    </c-col>
-                </c-row>
-            </c-container>
-        </c-card-body>
-    </c-card>
+                        <c-row [gutter]="{gx: 2}">
+                            <c-col>
+                                <div cFormFloating class="p-1 border bg-light">
+                                    <input class="smaller-font" cFormControl id="pickupLoc" type="text" [value]="loadedRide?.startLocationZip + ', ' + loadedRide?.startLocationCity + ' ' + loadedRide?.startLocationAddress!" disabled />
+                                    <label cLabel for="pickupLoc">Felvéve</label>
+                                </div>
+                            </c-col>
+                            <c-col>
+                                <div cFormFloating class="p-1 border bg-light">
+                                    <input class="smaller-font" cFormControl id="dropLoc" type="text" [value]="loadedRide?.finishLocationZip + ', ' + loadedRide?.finishLocationCity + ' ' + loadedRide?.finishLocationAddress!" disabled />
+                                    <label cLabel for="dropLoc">Leadva</label>
+                                </div>
+                            </c-col>
+                        </c-row>
 
-    <gallery [items]="galeryItems" [thumb]="false"></gallery>
-
-
-
-
+                        <c-row [gutter]="{gx: 2}">
+                            <c-col>
+                                <div cFormFloating class="p-1 border bg-light">
+                                    <input class="smaller-font" cFormControl id="driverRealName" type="text" [value]="loadedRide!.relRideDrivers[0]!.driver.driverRealName!" disabled />
+                                    <label cLabel for="driverRealName">Sofőr</label>
+                                </div>
+                            </c-col>
+                            <c-col>
+                                <div cFormFloating class="p-1 border bg-light ">
+                                    <input class="smaller-font" cFormControl id="modDate" type="text" [value]="formatDate(loadedRide!.modDate!, 'long')" disabled />
+                                    <label cLabel for="modDate">Lezárva</label>
+                                </div>
+                            </c-col>
+                        </c-row>
+                        <hr>
+                        Jegyzőkönyv adatok
+                        <c-row [gutter]="{gx: 1}" *ngFor="let surveyResult of loadedRide.rideSurveyResults; let i = index">
+                            <c-col >
+                                <div cFormFloating class="p-1 border bg-light ">
+                                    <input class="smaller-font" cFormControl id="{{ surveyResult.stype.typeName }}_{{i}}" type="text" [value]="surveyResult.survValue" disabled />
+                                    <label cLabel for="modDate">{{ surveyResult.stype.typeName }}</label>
+                                </div>
+                            </c-col>
+                        </c-row>
+                    </c-container>
+                </c-card-body>
+            </c-card>
+        </c-tab-pane>
+        <c-tab-pane class="p-3">
+            <c-card *ngIf="loadedRide != undefined">
+                <c-card-body>
+                    <h5 cCardTitle>Fényképek</h5>
+                    <hr>
+                    <gallery [items]="galeryItems" [thumb]="true"></gallery>
+                </c-card-body>
+            </c-card>
+        </c-tab-pane>
+    </c-tab-content>
 </div>

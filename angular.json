@@ -41,6 +41,7 @@
             ]
           },
           "configurations": {
+            "proxyConfig": "proxy.conf.json",
             "production": {
               "fileReplacements": [
                 {
@@ -51,8 +52,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "1mb",
+                  "maximumError": "10mb"
                 },
                 {
                   "type": "anyComponentStyle",

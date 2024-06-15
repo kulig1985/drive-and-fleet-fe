@@ -6,8 +6,8 @@ import {
   ColComponent,
   ContainerComponent,
   FormControlDirective,
-  FormFloatingDirective, FormLabelDirective, GutterDirective,
-  RowComponent
+  FormFloatingDirective, FormLabelDirective, GutterDirective, NavComponent, NavItemComponent, NavLinkDirective,
+  RowComponent, TabContentComponent, TabContentRefDirective, TabPaneComponent
 } from "@coreui/angular";
 import {IconDirective} from "@coreui/icons-angular";
 import {SurveyModule} from "survey-angular-ui";
@@ -17,6 +17,7 @@ import {RideDTO} from "../work-order/dto/new-work-order-dto";
 import {CommonModule, DatePipe, NgForOf} from "@angular/common";
 import {Gallery, GalleryItem, GalleryModule, ImageItem} from "ng-gallery";
 import {ViewRideService} from "./view-ride.service";
+import {DxLoadIndicatorModule} from "devextreme-angular";
 
 @Component({
   selector: 'app-view-ride',
@@ -40,7 +41,14 @@ import {ViewRideService} from "./view-ride.service";
     CardTitleDirective,
     CardSubtitleDirective,
     CardTextDirective,
-    GalleryModule
+    GalleryModule,
+    DxLoadIndicatorModule,
+    NavComponent,
+    NavItemComponent,
+    TabContentRefDirective,
+    NavLinkDirective,
+    TabContentComponent,
+    TabPaneComponent
   ],
   templateUrl: './view-ride.component.html',
   styleUrl: './view-ride.component.scss'
@@ -51,6 +59,7 @@ export class ViewRideComponent implements OnInit{
   loadedRide: RideDTO | undefined = undefined;
   icons = { cilArrowLeft, cilArrowThickFromRight};
   galeryItems: GalleryItem[] = [];
+  activeTab: number = 0;
 
   constructor(private route: ActivatedRoute,
               private daoService: DaoService,
@@ -59,6 +68,9 @@ export class ViewRideComponent implements OnInit{
               private viewRideService : ViewRideService) {
   }
 
+  setActiveTab(tabIndex: number) {
+    this.activeTab = tabIndex;
+  }
   ngOnInit(): void {
 
     this.route.queryParams.subscribe(params => {

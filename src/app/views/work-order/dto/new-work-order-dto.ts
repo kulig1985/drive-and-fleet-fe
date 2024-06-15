@@ -11,6 +11,8 @@ export interface PartnerDTO {
 export interface WorkOrderDTO {
     orderId?: number | null;
     plateNr?: string | null;
+    carType?: string | null;
+    carUserName?: string | null;
     rideCnt?: number | null;
     commentText?: string | null;
     crDate?: string | null;
@@ -35,10 +37,9 @@ export interface RelRideDriverDTO {
 export interface RideDTO {
     
     rideId?: number;
-    carType: string | null;
-    carUserName: string | null;
     orderId?: number;
     executeNr: number;
+    pickUpTime: Date | null;
     startLocationZip: number | null;
     startLocationCity: string | null;
     startLocationAddress: string | null;

@@ -32,5 +32,7 @@ export const appConfig: ApplicationConfig = {
     IconSetService,
     provideAnimations(),
     provideHttpClient(withFetch(), withInterceptors([jwtInterceptor])),
+    //{provide: LocationStrategy, useClass: HashLocationStrategy}
+
   ]
 };

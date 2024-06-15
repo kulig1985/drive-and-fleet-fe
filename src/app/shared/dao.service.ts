@@ -37,4 +37,8 @@ export class DaoService {
     return this.httpClient.get(environment.findRideById, {params: params})
   }
 
+  findAllRide() {
+    return this.httpClient.get(environment.findAllRide);
+  }
+
 }

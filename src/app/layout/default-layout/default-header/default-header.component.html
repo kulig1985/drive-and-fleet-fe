@@ -1,4 +1,7 @@
 <!--<c-header class="mb-4 d-print-none" position="sticky">-->
+
+
+
 <ng-container>
   <c-container [fluid]="true" class="border-bottom px-4">
     <button
@@ -48,10 +51,65 @@
       <ng-container *ngTemplateOutlet="userDropdown" />
     </c-header-nav>
 
+
+
   </c-container>
-  <c-container [fluid]="true" class="px-4">
-    <c-breadcrumb-router />
-  </c-container>
+
+    <div class="container" *ngIf="showHeader">
+
+        <div class="row">
+            <div class="col">
+                <button (click)="toggleNewWorkOrderModal()" cButton color="primary" variant="outline">Rendelés<svg [cIcon]="iconsAll.cilPlus"></svg></button>
+            </div>
+            <div class="col">
+                <div class="input-group">
+                <span class="input-group-text" id="basic-addon1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                  </svg>
+                </span>
+                    <input [(ngModel)]="plateSearchText" (ngModelChange)="onPlateSearchTextChange($event)" type="text" class="form-control" placeholder="Rendszám" aria-label="Rendszám" aria-describedby="basic-addon1">
+                </div>
+            </div>
+        </div>
+    </div>
+<!--  <c-container [fluid]="true" class="px-4">-->
+
+<!--      <c-container *ngIf="showHeader">-->
+<!--          <c-row>-->
+<!--              <c-col xs="6">-->
+<!--                  <button (click)="toggleNewWorkOrderModal()" cButton color="primary" variant="outline">Rendelés<svg [cIcon]="iconsAll.cilPlus"></svg></button>-->
+<!--              </c-col>-->
+<!--&lt;!&ndash;              <c-col xs="4">&ndash;&gt;-->
+<!--&lt;!&ndash;                  <button (click)="loadWorkflowData()" cButton color="warning" variant="outline">..<svg [cIcon]="iconsAll.cilFilter"></svg> </button>&ndash;&gt;-->
+<!--&lt;!&ndash;              </c-col>&ndash;&gt;-->
+<!--              <c-col xs="6">-->
+<!--                  <input aria-describedby="basic-addon1"-->
+<!--                         aria-label="Username"-->
+<!--                         cFormControl-->
+<!--                         placeholder="Rendszám..."-->
+<!--                         [(ngModel)]="plateSearchText"-->
+<!--                  />-->
+<!--              </c-col>-->
+<!--          </c-row>-->
+<!--      </c-container>-->
+
+<!--&lt;!&ndash;      <c-row>&ndash;&gt;-->
+<!--&lt;!&ndash;          <c-col xs="4">&ndash;&gt;-->
+<!--&lt;!&ndash;              <c-breadcrumb-router />&ndash;&gt;-->
+<!--&lt;!&ndash;          </c-col>&ndash;&gt;-->
+<!--&lt;!&ndash;          <c-col xs="8">&ndash;&gt;-->
+<!--&lt;!&ndash;              <c-input-group class="mb-1">&ndash;&gt;-->
+<!--&lt;!&ndash;              <span cInputGroupText id="basic-addon1">&#128269;</span>&ndash;&gt;-->
+<!--&lt;!&ndash;              <input aria-describedby="basic-addon1"&ndash;&gt;-->
+<!--&lt;!&ndash;                     aria-label="Username"&ndash;&gt;-->
+<!--&lt;!&ndash;                     cFormControl&ndash;&gt;-->
+<!--&lt;!&ndash;                     placeholder="Rendszám"&ndash;&gt;-->
+<!--&lt;!&ndash;              />&ndash;&gt;-->
+<!--&lt;!&ndash;              </c-input-group>&ndash;&gt;-->
+<!--&lt;!&ndash;          </c-col>&ndash;&gt;-->
+<!--&lt;!&ndash;      </c-row>&ndash;&gt;-->
+<!--  </c-container>-->
 </ng-container>
 <!--</c-header>-->
 
