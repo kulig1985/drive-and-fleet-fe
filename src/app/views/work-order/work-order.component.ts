@@ -73,7 +73,7 @@ import {
     DxButtonModule,
     DxFormComponent,
     DxFormModule,
-    DxLoadIndicatorModule,
+    DxLoadIndicatorModule, DxLookupModule,
     DxPopupModule,
     DxScrollViewComponent,
     DxScrollViewModule,
@@ -160,7 +160,8 @@ import {DriverModificationDto} from "./dto/driver-modification.dto";
         PlateFilterPipe,
         FormsModule,
         BadgeComponent,
-        DxAccordionModule
+        DxAccordionModule,
+        DxLookupModule
     ],
   providers: [DatePipe],
   templateUrl: './work-order.component.html',

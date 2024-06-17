@@ -22,7 +22,7 @@
             <form  (submit)="saveNewWorkOrder($event)">
                 <dx-form #newWorkOrderForm [colCount]="2" [formData]="newWorkOrder" [showValidationSummary]="true">
                     <dxi-item itemType="group" caption="Rendelési adatok">
-                        <dxi-item dataField="partner.partnerId" editorType="dxLookup"
+                        <dxi-item [dataField]="'partner.partnerId'" editorType="dxLookup"
                                   [editorOptions]="{dataSource : validPartnerList,
                                                 valueExpr: 'partnerId',
                                                 displayExpr: 'partnerName',
