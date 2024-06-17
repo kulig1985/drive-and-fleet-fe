@@ -476,7 +476,7 @@ export class WorkOrderComponent implements OnInit{
         }
         return workOrder.rides!.some(
             (ride) =>
-                ride.executeNr > currentRide.executeNr &&
+                ride.executeNr < currentRide.executeNr &&
                 ride.boolId === 1 &&
                 ride.rideId !== currentRide.rideId
         );
