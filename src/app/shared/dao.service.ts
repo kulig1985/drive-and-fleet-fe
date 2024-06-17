@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {environment} from "../environments/environment";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {WorkOrderDTO} from "../views/work-order/dto/new-work-order-dto";
+import {DriverModificationDto} from "../views/work-order/dto/driver-modification.dto";
 
 
 
@@ -39,6 +40,10 @@ export class DaoService {
 
   findAllRide() {
     return this.httpClient.get(environment.findAllRide);
+  }
+
+  modifyDriverForRide(driverModificationDto: DriverModificationDto) {
+    return this.httpClient.patch(environment.modifyDriverForRide, driverModificationDto);
   }
 
 }

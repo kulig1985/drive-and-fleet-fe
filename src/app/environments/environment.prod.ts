@@ -11,5 +11,6 @@ export const environment = {
     findRideById: "api/dao/findRideById",
     downloadPicture: "api/downloadPicture",
     findAllRide: "api/dao/findAllRide",
+    modifyDriverForRide: "api/modifyDriverForRide",
 
 }

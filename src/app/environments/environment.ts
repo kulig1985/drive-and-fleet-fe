@@ -11,5 +11,6 @@ export const environment = {
     findRideById: "http://127.0.0.1:3000/api/dao/findRideById",
     downloadPicture: "http://127.0.0.1:3000/api/downloadPicture",
     findAllRide: "http://127.0.0.1:3000/api/dao/findAllRide",
+    modifyDriverForRide: "http://127.0.0.1:3000/api/modifyDriverForRide",
 
 }

@@ -86,6 +86,7 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
 import {PlateFilterPipe} from "./plate-filter.pipe";
 import {TriggerService} from "../../shared/trigger.service";
 import {Subscription} from "rxjs";
+import {DriverModificationDto} from "./dto/driver-modification.dto";
 
 
 @Component({
@@ -183,11 +184,13 @@ export class WorkOrderComponent implements OnInit{
   validPartnerList : PartnerDTO[];
   driverList : DriverDTO[];
   toastVisible = false;
-  toastPosition = ToasterPlacement.TopCenter;
+  toastPosition = ToasterPlacement.BottomCenter;
   toastMessage = '';
   expandedWorkOrders: boolean[] = [];
   isLoading = false;
   plateChangeModalVisible = false;
+  driverChangePopupVisible = false;
+  driverModificationDto: DriverModificationDto;
   filterClosed = false;
   @ViewChild('newWorkOrderForm') newWorkOrderForm: DxFormComponent;
   @ViewChild('newWorkOrderPopup') newWorkOrderPopup: DxFormComponent;
@@ -337,8 +340,12 @@ export class WorkOrderComponent implements OnInit{
         this.plateChangeModalVisible = !this.plateChangeModalVisible;
     }
 
-    toggleChangeDriverModal(e:any, workOrder: WorkOrderDTO) {
-        e.event.stopPropagation();
+    toggleChangeDriverModal(ride: RideDTO) {
+        this.driverModificationDto = {rideId: ride.rideId!,
+                                      driverId: ride.relRideDrivers[0].driver.driverId};
+
+        console.log('driverModificationDto:', this.driverModificationDto)
+        this.driverChangePopupVisible = !this.plateChangeModalVisible;
     }
 
     closeNewWorkOrderPopup() {
@@ -346,26 +353,35 @@ export class WorkOrderComponent implements OnInit{
     }
     rideCntChanged(e : any) {
 
-      const rideCntToCreate = e.value;
+      const newRideValue = e.value;
 
-      console.log('create rideCntToCreate:', rideCntToCreate);
+      if (newRideValue > this.newWorkOrder.rides!.length) {
 
-      for (let i = 1; i <= rideCntToCreate; i++) {
+          const rideCntToCreate = newRideValue - this.newWorkOrder.rides!.length;
 
-          this.newWorkOrder.rides?.push({
-              finishLocationAddress: null,
-              finishLocationCity: null,
-              executeNr: this.newWorkOrder.rides?.length + 1,
-              pickUpTime: null,
-              relRideDrivers: [],
-              startLocationAddress: null,
-              startLocationCity: null,
-              startLocationZip: null,
-              finishLocationZip: null});
+          for (let i = 1; i <= rideCntToCreate; i++) {
 
+              this.newWorkOrder.rides?.push({
+                  finishLocationAddress: null,
+                  finishLocationCity: null,
+                  executeNr: this.newWorkOrder.rides?.length + 1,
+                  pickUpTime: null,
+                  relRideDrivers: [],
+                  startLocationAddress: null,
+                  startLocationCity: null,
+                  startLocationZip: null,
+                  finishLocationZip: null});
+          }
       }
 
-      this.newWorkOrderForm.instance.repaint();
+        if (newRideValue < this.newWorkOrder.rides!.length) {
+            const itemCntToRemove = this.newWorkOrder.rides!.length - newRideValue;
+            for (let i = 1; i <= itemCntToRemove; i++) {
+                this.newWorkOrder.rides!.pop();
+            }
+
+        }
+
   }
   saveNewWorkOrder(e: any) {
 
@@ -406,18 +422,36 @@ export class WorkOrderComponent implements OnInit{
                 this.showToast('Sikeres rendszám módosítás!');
                 this.loadWorkflowData();
                 this.isLoading = false;
+                this.plateChangeModalVisible = false;
             },
             error: (error: any) => {
                 console.error('saveNewWorkOrder error: ', error)
                 this.showToast('Hiba: ' + error);
                 this.isLoading = false;
+                this.plateChangeModalVisible = false;
             }
         });
 
     }
 
-    copyPlateNr() {
-
+    modifyDriverForRide(e: any) {
+      e.preventDefault();
+      console.log('modifyDriver invoked: ', this.driverModificationDto);
+      this.isLoading = true;
+      this.daoService.modifyDriverForRide(this.driverModificationDto).subscribe({
+          next: (modifyDriverForRideResult : any) => {
+              this.showToast('Sikeres sofőr módosítás!');
+              this.loadWorkflowData();
+              this.isLoading = false;
+              this.driverChangePopupVisible = false;
+          },
+          error: (error: any) => {
+              console.error('modifyDriverForRide error: ', error)
+              this.showToast('Hiba: ' + error.message);
+              this.isLoading = false;
+              this.driverChangePopupVisible = false;
+          }
+      })
     }
 
   showToast(message: string) {
@@ -437,7 +471,7 @@ export class WorkOrderComponent implements OnInit{
 
     disableRideSurvey(workOrder: WorkOrderDTO, currentRide: RideDTO): boolean {
         if (workOrder.rides?.length == 1) {
-            return true;
+            return false;
         }
         return workOrder.rides!.some(
             (ride) =>
@@ -453,6 +487,10 @@ export class WorkOrderComponent implements OnInit{
 
     rideSelected(e: any){
       console.log('rideSelected', e);
+    }
+
+    getBackgroundColor(workOrder: WorkOrderDTO): string {
+        return workOrder.rides?.filter(ride => ride.boolId == 1).length! > 0 ? 'rgba(245,184,184,0.5)' : 'rgba(203,227,238,0.5)';
     }
 
 

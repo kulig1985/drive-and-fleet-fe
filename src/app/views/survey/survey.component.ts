@@ -18,6 +18,8 @@ import {
   cilArrowLeft,
     cilArrowThickFromRight
 } from "@coreui/icons";
+import {DxLoadIndicatorModule} from "devextreme-angular";
+import {NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-survey',
@@ -32,7 +34,9 @@ import {
     ToastBodyComponent,
     ToastComponent,
     ToastHeaderComponent,
-    ToasterComponent
+    ToasterComponent,
+    DxLoadIndicatorModule,
+    NgIf
   ],
   templateUrl: './survey.component.html',
   styleUrl: './survey.component.scss'
@@ -44,8 +48,9 @@ export class SurveyComponent implements OnInit{
   model: Model;
   icons = { cilArrowLeft, cilArrowThickFromRight};
   toastVisible = false;
-  toastPosition = ToasterPlacement.TopCenter;
+  toastPosition = ToasterPlacement.BottomCenter;
   toastMessage = '';
+  isSaving = false;
 
   constructor(private route: ActivatedRoute,
               private surveyService: SurveyService,
@@ -120,21 +125,25 @@ export class SurveyComponent implements OnInit{
 
 
     survey.onComplete.add((sender, options) => {
-      options.showSaveInProgress();
+      this.isSaving = true;
 
       const baseSenderData = sender.data;
       baseSenderData.orderId = this.orderId;
       baseSenderData.rideId = this.rideId;
 
+      options.showDataSaving("Ürlap mentése!")
+      options.showSaveInProgress("Ürlap mentése folyamatban..")
+
       this.surveyService.postSurveyData(baseSenderData).subscribe({
         next: (surveySaveResult : any) => {
           console.log(surveySaveResult);
-          options.showDataSavingSuccess(surveySaveResult.message);
-          this.showToast("Sikeres ürlap mentés!")
+          this.isSaving = false;
+          //this.showToast("Sikeres ürlap mentés!")
           this.router.navigate(['/home/work-order']).then(r => {});
         },
         error: (error: any) => {
           options.showSaveError("Data save error: " + error)
+          this.isSaving = false;
         }
       })
     });

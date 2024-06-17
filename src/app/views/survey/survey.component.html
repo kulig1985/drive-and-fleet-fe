@@ -21,5 +21,15 @@
 
     <survey [model]="model"></survey>
 
+    <div class="centered-div" *ngIf="isSaving">
+        <dx-load-indicator
+                id="large-indicator"
+                height="60"
+                width="60"
+        ></dx-load-indicator>
+        <br>
+        Adatok mentése folyamatban...
+    </div>
+
 </div>
 

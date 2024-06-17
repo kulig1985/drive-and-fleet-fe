@@ -24,68 +24,44 @@
         <c-tab-pane class="p-3">
             <c-card *ngIf="loadedRide != undefined">
                 <c-card-body>
-                    <h5 cCardTitle>id: {{ loadedRide?.rideId }}</h5>
-                    <h6 cCardSubtitle class="mb-2 text-medium-emphasis">
-                    </h6>
+                    <h5 cCardTitle>Ürlap</h5>
                     <hr>
 
-                    <c-container class="px-4" >
+                    <div class="container">
                         Alap információk
-                        <c-row [gutter]="{gx: 2}">
-                            <c-col>
-                                <div cFormFloating class="p-1 border bg-light">
-                                    <input class="smaller-font" cFormControl id="orderId" type="text" [value]="loadedRide?.order?.orderId" disabled />
-                                    <label cLabel for="orderId">ID</label>
-                                </div>
-                            </c-col>
-                            <c-col>
-                                <div cFormFloating class="p-1 border bg-light">
-                                    <input class="smaller-font" cFormControl id="plateNr" type="text" [value]="loadedRide?.order?.plateNr" disabled />
-                                    <label cLabel for="plateNr">Rendszám</label>
-                                </div>
-                            </c-col>
-                        </c-row>
-
-                        <c-row [gutter]="{gx: 2}">
-                            <c-col>
-                                <div cFormFloating class="p-1 border bg-light">
-                                    <input class="smaller-font" cFormControl id="pickupLoc" type="text" [value]="loadedRide?.startLocationZip + ', ' + loadedRide?.startLocationCity + ' ' + loadedRide?.startLocationAddress!" disabled />
-                                    <label cLabel for="pickupLoc">Felvéve</label>
-                                </div>
-                            </c-col>
-                            <c-col>
-                                <div cFormFloating class="p-1 border bg-light">
-                                    <input class="smaller-font" cFormControl id="dropLoc" type="text" [value]="loadedRide?.finishLocationZip + ', ' + loadedRide?.finishLocationCity + ' ' + loadedRide?.finishLocationAddress!" disabled />
-                                    <label cLabel for="dropLoc">Leadva</label>
-                                </div>
-                            </c-col>
-                        </c-row>
-
-                        <c-row [gutter]="{gx: 2}">
-                            <c-col>
-                                <div cFormFloating class="p-1 border bg-light">
-                                    <input class="smaller-font" cFormControl id="driverRealName" type="text" [value]="loadedRide!.relRideDrivers[0]!.driver.driverRealName!" disabled />
-                                    <label cLabel for="driverRealName">Sofőr</label>
-                                </div>
-                            </c-col>
-                            <c-col>
-                                <div cFormFloating class="p-1 border bg-light ">
-                                    <input class="smaller-font" cFormControl id="modDate" type="text" [value]="formatDate(loadedRide!.modDate!, 'long')" disabled />
-                                    <label cLabel for="modDate">Lezárva</label>
-                                </div>
-                            </c-col>
-                        </c-row>
-                        <hr>
+                        <div class="row border-top">
+                            <div class="col border">
+                                <span class="smaller-font">id: <b>{{loadedRide?.order?.orderId}}</b></span>
+                            </div>
+                            <div class="col border">
+                                <span class="smaller-font">Rendszám: <b>{{loadedRide?.order?.plateNr}}</b></span>
+                            </div>
+                        </div>
+                        <div class="row border-top">
+                            <div class="col border">
+                                <span class="smaller-font">Felvéve: <b>{{loadedRide?.startLocationZip + ', ' + loadedRide?.startLocationCity + ' ' + loadedRide?.startLocationAddress!}}</b></span>
+                            </div>
+                            <div class="col border">
+                                <span class="smaller-font">Leadva: <b>{{loadedRide?.finishLocationZip + ', ' + loadedRide?.finishLocationCity + ' ' + loadedRide?.finishLocationAddress!}}</b></span>
+                            </div>
+                        </div>
+                        <div class="row border-top">
+                            <div class="col border">
+                                <span class="smaller-font">Sofőr: <b>{{loadedRide!.relRideDrivers[0]!.driver.driverRealName!}}</b></span>
+                            </div>
+                            <div class="col border">
+                                <span class="smaller-font">Lezárva: <b>{{formatDate(loadedRide!.modDate!, 'long')}}</b></span>
+                            </div>
+                        </div>
                         Jegyzőkönyv adatok
-                        <c-row [gutter]="{gx: 1}" *ngFor="let surveyResult of loadedRide.rideSurveyResults; let i = index">
-                            <c-col >
-                                <div cFormFloating class="p-1 border bg-light ">
-                                    <input class="smaller-font" cFormControl id="{{ surveyResult.stype.typeName }}_{{i}}" type="text" [value]="surveyResult.survValue" disabled />
-                                    <label cLabel for="modDate">{{ surveyResult.stype.typeName }}</label>
-                                </div>
-                            </c-col>
-                        </c-row>
-                    </c-container>
+                        <div class="row border-top" >
+                            <div class="col border" *ngFor="let surveyResult of loadedRide.rideSurveyResults; let i = index">
+                                <span class="smaller-font">{{ surveyResult.stype.typeName }} <b>{{surveyResult.survValue}}</b></span>
+                            </div>
+                        </div>
+                    </div>
+
+
                 </c-card-body>
             </c-card>
         </c-tab-pane>

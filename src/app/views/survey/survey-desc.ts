@@ -84,7 +84,7 @@ export const surveyDesc ={
                     "storeDataAsText":false,
                     "waitForUpload":true,
                     "allowMultiple":true,
-                    "maxSize":102400,
+                    "maxSize":102400000,
                     "hideNumber":true,
                     "isRequired":true,
                     "requiredErrorText": "Tölts fel fényképeket!",
