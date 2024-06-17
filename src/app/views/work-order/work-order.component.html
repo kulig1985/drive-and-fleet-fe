@@ -23,10 +23,9 @@
                 <dx-form #newWorkOrderForm [colCount]="2" [formData]="newWorkOrder" [showValidationSummary]="true">
                     <dxi-item itemType="group" caption="Rendelési adatok">
                         <dxi-item dataField="partner.partnerId" editorType="dxLookup"
-                                  [editorOptions]="{items : validPartnerList,
+                                  [editorOptions]="{dataSource : validPartnerList,
                                                 valueExpr: 'partnerId',
                                                 displayExpr: 'partnerName',
-                                                fullScreen: false,
                                                 dropDownOptions: {fullScreen: false}}">
                             <dxo-label text="Partner"> </dxo-label>
                             <dxi-validation-rule type="required" message="Válassz partnert!"/>

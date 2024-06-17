@@ -6,6 +6,7 @@ import {DefaultLayoutComponent} from "./layout";
 import {LoginComponent} from "./views/login/login.component";
 import {authGuard} from "./auth/auth.guard";
 import {LogoutComponent} from "./views/logout/logout.component";
+import {SignUpComponent} from "./views/sign-up/sign-up.component";
 
 
 export const routes: Routes = [
@@ -19,6 +20,15 @@ export const routes: Routes = [
     component: LoginComponent,
     data: {
       title: 'Login'
+    },
+    children: [
+    ]
+  },
+  {
+    path: 'sign-up',
+    component: SignUpComponent,
+    data: {
+      title: 'Sign-up'
     },
     children: [
     ]

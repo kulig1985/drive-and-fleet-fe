@@ -1,6 +1,7 @@
 export const environment = {
 
     signIn: "auth/signIn",
+    createUser: "auth/createUser",
     validateJwt: "auth/validateJwt",
     workOrderList: "api/dao/findAllWorkOrder",
     uploadUrl: "api/handleUpload",

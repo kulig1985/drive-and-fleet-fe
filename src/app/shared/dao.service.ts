@@ -3,6 +3,7 @@ import {environment} from "../environments/environment";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {WorkOrderDTO} from "../views/work-order/dto/new-work-order-dto";
 import {DriverModificationDto} from "../views/work-order/dto/driver-modification.dto";
+import {SignUpDTO} from "../views/sign-up/dto/sign-up.dto";
 
 
 
@@ -44,6 +45,11 @@ export class DaoService {
 
   modifyDriverForRide(driverModificationDto: DriverModificationDto) {
     return this.httpClient.patch(environment.modifyDriverForRide, driverModificationDto);
+  }
+
+  createUser(signUpDto: SignUpDTO) {
+    return this.httpClient.post(environment.createUser, signUpDto);
+
   }
 
 }

@@ -1,6 +1,7 @@
 export const environment = {
 
     signIn: "http://127.0.0.1:3000/auth/signIn",
+    createUser: "http://127.0.0.1:3000/auth/createUser",
     validateJwt: "http://127.0.0.1:3000/auth/validateJwt",
     workOrderList: "http://127.0.0.1:3000/api/dao/findAllWorkOrder",
     uploadUrl: "http://127.0.0.1:3000/api/handleUpload",
@@ -12,5 +13,6 @@ export const environment = {
     downloadPicture: "http://127.0.0.1:3000/api/downloadPicture",
     findAllRide: "http://127.0.0.1:3000/api/dao/findAllRide",
     modifyDriverForRide: "http://127.0.0.1:3000/api/modifyDriverForRide",
+
 
 }

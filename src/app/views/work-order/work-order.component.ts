@@ -239,6 +239,7 @@ export class WorkOrderComponent implements OnInit{
       this.daoService.findAllValidPartner().subscribe(
           {
               next: (validPartners : any) => {
+                  console.log('validPartners', validPartners)
                   this.validPartnerList = validPartners;
               },
               error: (error : any) => {
