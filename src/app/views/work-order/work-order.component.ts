@@ -278,7 +278,6 @@ export class WorkOrderComponent implements OnInit{
       )
 
       this.triggerOpenNewOrderPopupSubscripton = this.triggerService.triggerOpenNewOrderPopupFunctionObservable.subscribe(() => {
-
           this.newWorkOrderModalVisible = true;
 
       });
@@ -286,23 +285,20 @@ export class WorkOrderComponent implements OnInit{
       this.triggerSearchTextChangedSubscripton = this.triggerService.triggerSearchTextChangedFunctionObservable.subscribe((newValue: string) => {
           console.log('triggerSearchTextChangedSubscripton emitted: ', newValue);
           this.plateSearchText = newValue;
-          this.filterOrders();
-
-
+          this.applyAllFilters();
       });
 
       this.triggerOwnRideSubscripton = this.triggerService.triggerOwnRideFunctionObservable.subscribe((newValue : boolean) => {
           console.log('triggerOwnRideSubscripton emitted: ', newValue);
           this.ownRideValue = newValue;
-          this.filterOrders();
+          this.applyAllFilters();
 
 
       });
-
       this.triggerClosedRideSubscripton = this.triggerService.triggerClosedRideFunctionObservable.subscribe((newValue : boolean) => {
           console.log('triggerClosedRideSubscripton emitted: ', newValue);
           this.closeRideValue = newValue;
-          this.filterOrders();
+          this.applyAllFilters();
       });
 
       this.daoService.findAllZipCity().subscribe({
@@ -317,27 +313,39 @@ export class WorkOrderComponent implements OnInit{
 
   }
 
-  private filterOrders() {
+    filterByPlateSearchText() {
+        this.filteredWorkOrderList = this.workOrderList.filter(workOrder =>
+            workOrder.plateNr?.toLowerCase().includes(this.plateSearchText.toLowerCase())
+        );
+    }
 
-      this.filteredWorkOrderList = this.workOrderList.filter(workOrder => workOrder.plateNr?.toLowerCase().includes(this.plateSearchText.toLowerCase()));
+    filterByOwnRide() {
+        if (this.ownRideValue) {
+            const loggedUserName = this.authService.getLoggedUserName();
+            this.filteredWorkOrderList = this.filteredWorkOrderList.filter(workOrder =>
+                workOrder.rides!.some(ride =>
+                    ride.relRideDrivers.some(relRideDriver =>
+                        relRideDriver.driver.driverName === loggedUserName
+                    )
+                )
+            );
+        }
+    }
 
-      if (this.ownRideValue) {
-          this.filteredWorkOrderList = this.workOrderList.filter(workOrder =>
-              workOrder.rides!.some(ride =>
-                  ride.relRideDrivers.some(relRideDriver =>
-                      relRideDriver.driver.driverName === this.authService.getLoggedUserName()
-                  )
-              )
-          )
-      }
+    filterByClosedRide() {
+        if (this.closeRideValue) {
+            this.filteredWorkOrderList = this.filteredWorkOrderList.filter(workOrder =>
+                workOrder.rides!.every(ride => ride.boolId == 1)
+            );
+        }
+    }
 
-      if (!this.closeRideValue) {
-          this.filteredWorkOrderList = this.workOrderList.filter(workOrder =>
-              workOrder.rides!.every(ride => ride.boolId == 1)
-          )
-      }
-
-  }
+    applyAllFilters() {
+        this.filteredWorkOrderList = this.workOrderList.slice();  // Reset to the full list
+        this.filterByPlateSearchText();
+        this.filterByOwnRide();
+        this.filterByClosedRide();
+    }
 
     loadWorkflowData() {
       this.isLoading = true;
@@ -347,7 +355,6 @@ export class WorkOrderComponent implements OnInit{
                     console.log('workOrders', workOrders);
                     this.workOrderList = workOrders;
                     this.filteredWorkOrderList = this.workOrderList;
-                    this.filterOrders();
                     this.expandedWorkOrders = new Array(this.workOrderList.length).fill(false);
                     this.isLoading = false;
                 },
