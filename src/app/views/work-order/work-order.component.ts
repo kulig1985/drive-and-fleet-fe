@@ -2,9 +2,13 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {
     AccordionButtonDirective,
     AccordionComponent,
-    AccordionItemComponent, AlertComponent, BadgeComponent, BorderDirective,
+    AccordionItemComponent,
+    AlertComponent,
+    BadgeComponent,
+    BorderDirective,
     ButtonCloseDirective,
-    ButtonDirective, ButtonGroupComponent,
+    ButtonDirective,
+    ButtonGroupComponent,
     CardBodyComponent,
     CardComponent,
     CardFooterComponent,
@@ -26,7 +30,9 @@ import {
     FormFloatingDirective,
     FormLabelDirective,
     FormTextDirective,
-    GutterDirective, InputGroupComponent, InputGroupTextDirective,
+    GutterDirective,
+    InputGroupComponent,
+    InputGroupTextDirective,
     ModalBodyComponent,
     ModalComponent,
     ModalFooterComponent,
@@ -45,7 +51,8 @@ import {
     TemplateIdDirective,
     ToastBodyComponent,
     ToastComponent,
-    ToasterComponent, ToasterPlacement,
+    ToasterComponent,
+    ToasterPlacement,
     ToastHeaderComponent,
     WidgetStatFComponent
 } from "@coreui/angular";
@@ -60,12 +67,12 @@ import {
     cilCarAlt,
     cilChartPie,
     cilCheck,
-    cilPlus,
-    cilSpeedometer,
-    cilReload,
-    cilOptions,
     cilClipboard,
-    cilFilter
+    cilFilter,
+    cilOptions,
+    cilPlus,
+    cilReload,
+    cilSpeedometer
 } from "@coreui/icons";
 import {
     DxAccordionComponent,
@@ -73,20 +80,23 @@ import {
     DxButtonModule,
     DxFormComponent,
     DxFormModule,
-    DxLoadIndicatorModule, DxLookupModule,
+    DxLoadIndicatorModule,
+    DxLookupModule,
     DxPopupModule,
     DxScrollViewComponent,
     DxScrollViewModule,
     DxTabPanelModule,
 } from "devextreme-angular";
 import {DxButtonTypes} from "devextreme-angular/ui/button";
-import {FormsModule, ReactiveFormsModule, UntypedFormBuilder} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {DriverDTO, PartnerDTO, RideDTO, WorkOrderDTO} from "./dto/new-work-order-dto";
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {PlateFilterPipe} from "./plate-filter.pipe";
 import {TriggerService} from "../../shared/trigger.service";
 import {Subscription} from "rxjs";
 import {DriverModificationDto} from "./dto/driver-modification.dto";
+import {ZipCityDTO} from "./dto/zip-city.dto";
+import {AuthService} from "../../auth/auth.service";
 
 
 @Component({
@@ -192,6 +202,7 @@ export class WorkOrderComponent implements OnInit{
   plateChangeModalVisible = false;
   driverChangePopupVisible = false;
   driverModificationDto: DriverModificationDto;
+  zipCityList: ZipCityDTO[];
   filterClosed = false;
   @ViewChild('newWorkOrderForm') newWorkOrderForm: DxFormComponent;
   @ViewChild('newWorkOrderPopup') newWorkOrderPopup: DxFormComponent;
@@ -199,9 +210,15 @@ export class WorkOrderComponent implements OnInit{
   @ViewChild('workOrderListAccordion') workOrderListAccordion: DxAccordionComponent;
 
   plateSearchText = '';
-    idCaption: 'id';
+  idCaption: 'id';
   triggerOpenNewOrderPopupSubscripton: Subscription;
   triggerSearchTextChangedSubscripton: Subscription;
+
+  triggerOwnRideSubscripton: Subscription;
+  triggerClosedRideSubscripton: Subscription;
+
+  ownRideValue = false;
+  closeRideValue = true;
 
 
   addRideButtonOption: DxButtonTypes.Properties = {
@@ -225,6 +242,7 @@ export class WorkOrderComponent implements OnInit{
   constructor(private daoService: DaoService,
               private router: Router,
               private datePipe: DatePipe,
+              private authService: AuthService,
               private triggerService: TriggerService) {
       this.newWorkOrder = {partner: {}, rideCnt: null, rides: []};
       this.rideCntChanged = this.rideCntChanged.bind(this);
@@ -266,14 +284,58 @@ export class WorkOrderComponent implements OnInit{
       });
 
       this.triggerSearchTextChangedSubscripton = this.triggerService.triggerSearchTextChangedFunctionObservable.subscribe((newValue: string) => {
-          console.log('emitted: ', newValue)
-          this.filteredWorkOrderList = this.workOrderList.filter(workOrder => workOrder.plateNr?.toLowerCase().includes(newValue.toLowerCase()));
+          console.log('triggerSearchTextChangedSubscripton emitted: ', newValue);
+          this.plateSearchText = newValue;
+          this.filterOrders();
 
 
       });
 
+      this.triggerOwnRideSubscripton = this.triggerService.triggerOwnRideFunctionObservable.subscribe((newValue : boolean) => {
+          console.log('triggerOwnRideSubscripton emitted: ', newValue);
+          this.ownRideValue = newValue;
+          this.filterOrders();
 
 
+      });
+
+      this.triggerClosedRideSubscripton = this.triggerService.triggerClosedRideFunctionObservable.subscribe((newValue : boolean) => {
+          console.log('triggerClosedRideSubscripton emitted: ', newValue);
+          this.closeRideValue = newValue;
+          this.filterOrders();
+      });
+
+      this.daoService.findAllZipCity().subscribe({
+          next: (zipCityResult : any) => {
+              console.log('zipCityResult', zipCityResult)
+              this.zipCityList = zipCityResult;
+          },
+          error: (error : any) => {
+              console.error('findAllZipCity error: ', error)
+          }
+      })
+
+  }
+
+  private filterOrders() {
+
+      this.filteredWorkOrderList = this.workOrderList.filter(workOrder => workOrder.plateNr?.toLowerCase().includes(this.plateSearchText.toLowerCase()));
+
+      if (this.ownRideValue) {
+          this.filteredWorkOrderList = this.workOrderList.filter(workOrder =>
+              workOrder.rides!.some(ride =>
+                  ride.relRideDrivers.some(relRideDriver =>
+                      relRideDriver.driver.driverName === this.authService.getLoggedUserName()
+                  )
+              )
+          )
+      }
+
+      if (!this.closeRideValue) {
+          this.filteredWorkOrderList = this.workOrderList.filter(workOrder =>
+              workOrder.rides!.every(ride => ride.boolId == 1)
+          )
+      }
 
   }
 
@@ -285,6 +347,7 @@ export class WorkOrderComponent implements OnInit{
                     console.log('workOrders', workOrders);
                     this.workOrderList = workOrders;
                     this.filteredWorkOrderList = this.workOrderList;
+                    this.filterOrders();
                     this.expandedWorkOrders = new Array(this.workOrderList.length).fill(false);
                     this.isLoading = false;
                 },
@@ -352,6 +415,7 @@ export class WorkOrderComponent implements OnInit{
 
     closeNewWorkOrderPopup() {
         this.newWorkOrderForm.instance.clear();
+        this.newWorkOrder = {partner: {}, rideCnt: null, rides: []};
     }
     rideCntChanged(e : any) {
 
@@ -494,6 +558,21 @@ export class WorkOrderComponent implements OnInit{
     getBackgroundColor(workOrder: WorkOrderDTO): string {
         return workOrder.rides?.filter(ride => ride.boolId == 1).length! > 0 ? 'rgba(245,184,184,0.5)' : 'rgba(203,227,238,0.5)';
     }
+
+    zipChanged(zipType: string, index: number): void {
+        const ride = this.newWorkOrder!.rides![index];
+
+        if (zipType === 'start' && ride.startLocationZip) {
+            const city = this.zipCityList.find(zipResult => zipResult.zip === ride.startLocationZip)?.city;
+            ride.startLocationCity = city || '';
+        }
+
+        if (zipType === 'finish' && ride.finishLocationZip) {
+            const city = this.zipCityList.find(zipResult => zipResult.zip === ride.finishLocationZip)?.city;
+            ride.finishLocationCity = city || '';
+        }
+    }
+
 
 
     protected readonly JSON = JSON;

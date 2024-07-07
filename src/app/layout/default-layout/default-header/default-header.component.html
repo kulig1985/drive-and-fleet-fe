@@ -55,13 +55,16 @@
 
   </c-container>
 
-    <div class="container" *ngIf="showHeader">
+<!--    <div class="container" *ngIf="showHeader">-->
+        <c-container *ngIf="showHeader">
 
-        <div class="row">
-            <div class="col">
+<!--        <div class="row" style="margin-top: 10px; margin-bottom: 10px; margin-left: 5px; margin-right: 5px;">-->
+            <c-row style="margin-top: 10px; margin-bottom: 10px; margin-left: 5px; margin-right: 5px;">
+                <c-col>
                 <button (click)="toggleNewWorkOrderModal()" cButton color="primary" variant="outline">Rendelés<svg [cIcon]="iconsAll.cilPlus"></svg></button>
-            </div>
-            <div class="col">
+                </c-col>
+
+                <c-col>
                 <div class="input-group">
                 <span class="input-group-text" id="basic-addon1">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
@@ -70,9 +73,25 @@
                 </span>
                     <input [(ngModel)]="plateSearchText" (ngModelChange)="onPlateSearchTextChange($event)" type="text" class="form-control" placeholder="Rendszám" aria-label="Rendszám" aria-describedby="basic-addon1">
                 </div>
-            </div>
-        </div>
-    </div>
+                </c-col>
+            </c-row>
+<!--        </div>-->
+        <c-row style="margin-left: 5px; margin-right: 5px;">
+            <c-col>
+                <div class="form-check form-switch">
+                    <input [(ngModel)]="ownRideValue" (ngModelChange)="onOwnRideChange($event)" class="form-check-input" type="checkbox" id="flexSwichOwnRide">
+                    <label class="form-check-label" style="font-size: 12px;" for="flexSwichOwnRide">Csak a saját fuvarok</label>
+                </div>
+            </c-col>
+            <c-col>
+                <div class="form-check form-switch">
+                    <input [(ngModel)]="closeRideValue" (ngModelChange)="onClosedRideChange($event)" class="form-check-input" type="checkbox" id="flexSwichClosedRide">
+                    <label class="form-check-label" style="font-size: 12px;" for="flexSwichClosedRide">Lezárt fuvarok is</label>
+                </div>
+            </c-col>
+        </c-row>
+        </c-container>
+<!--    </div>-->
 <!--  <c-container [fluid]="true" class="px-4">-->
 
 <!--      <c-container *ngIf="showHeader">-->

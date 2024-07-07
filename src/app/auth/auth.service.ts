@@ -67,5 +67,11 @@ export class AuthService {
     return jwtObjectParsed.driverType == 'ADMIN';
   }
 
+  getLoggedUserName() {
+    let decoded = jwt_decode(this.showJwt()!);
+    let jwtObjectParsed = JSON.parse(JSON.stringify(decoded))
+    return jwtObjectParsed.driverName;
+  }
+
 
 }

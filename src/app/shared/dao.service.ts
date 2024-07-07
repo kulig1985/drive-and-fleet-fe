@@ -49,7 +49,12 @@ export class DaoService {
 
   createUser(signUpDto: SignUpDTO) {
     return this.httpClient.post(environment.createUser, signUpDto);
-
   }
+
+
+  findAllZipCity(){
+    return this.httpClient.get(environment.findAllZipCity);
+  }
+
 
 }

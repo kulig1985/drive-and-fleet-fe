@@ -42,7 +42,7 @@
                     </button>
                   </c-col>-->
                     @if (loginError) {
-                        <c-alert class="login-error" color="danger">Hibás felhasználónév vagy jelszó!</c-alert>
+                        <c-alert class="login-error" color="danger">Hibás felhasználónév vagy jelszó! {{loginErrorMessage}}</c-alert>
                     }
 
                 </c-row>

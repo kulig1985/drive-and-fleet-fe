@@ -8,7 +8,7 @@
         </c-col>
     </c-row>
 
-    <div class="centered-div" *ngIf="loadedRide == undefined">
+    <div class="centered-div" *ngIf="isLoading">
         <dx-load-indicator
                 id="large-indicator"
                 height="60"
@@ -16,63 +16,77 @@
         ></dx-load-indicator>
     </div>
 
-    <c-nav variant="tabs">
-        <a [active]="activeTab === 0" (click)="setActiveTab(0)" [cTabContent]="tabContent"  [tabPaneIdx]="0" cNavLink>Jegyzőkönyv</a>
-        <a [active]="activeTab === 1" (click)="setActiveTab(1)" [cTabContent]="tabContent"  [tabPaneIdx]="1" cNavLink>Fényképek</a>
-    </c-nav>
-    <c-tab-content #tabContent="cTabContent">
-        <c-tab-pane class="p-3">
-            <c-card *ngIf="loadedRide != undefined">
-                <c-card-body>
-                    <h5 cCardTitle>Ürlap</h5>
-                    <hr>
+    <section id="invoice" *ngIf="!isLoading">
+        <div class="container my-md-5 py-0" *ngIf="!isLoading">
 
-                    <div class="container">
-                        Alap információk
-                        <div class="row border-top">
-                            <div class="col border">
-                                <span class="smaller-font">id: <b>{{loadedRide?.order?.orderId}}</b></span>
-                            </div>
-                            <div class="col border">
-                                <span class="smaller-font">Rendszám: <b>{{loadedRide?.order?.plateNr}}</b></span>
-                            </div>
-                        </div>
-                        <div class="row border-top">
-                            <div class="col border">
-                                <span class="smaller-font">Felvéve: <b>{{loadedRide?.startLocationZip + ', ' + loadedRide?.startLocationCity + ' ' + loadedRide?.startLocationAddress!}}</b></span>
-                            </div>
-                            <div class="col border">
-                                <span class="smaller-font">Leadva: <b>{{loadedRide?.finishLocationZip + ', ' + loadedRide?.finishLocationCity + ' ' + loadedRide?.finishLocationAddress!}}</b></span>
-                            </div>
-                        </div>
-                        <div class="row border-top">
-                            <div class="col border">
-                                <span class="smaller-font">Sofőr: <b>{{loadedRide!.relRideDrivers[0]!.driver.driverRealName!}}</b></span>
-                            </div>
-                            <div class="col border">
-                                <span class="smaller-font">Lezárva: <b>{{formatDate(loadedRide!.modDate!, 'long')}}</b></span>
-                            </div>
-                        </div>
-                        Jegyzőkönyv adatok
-                        <div class="row border-top" >
-                            <div class="col border" *ngFor="let surveyResult of loadedRide.rideSurveyResults; let i = index">
-                                <span class="smaller-font">{{ surveyResult.stype.typeName }} <b>{{surveyResult.survValue}}</b></span>
-                            </div>
-                        </div>
+            <div class=" d-md-flex justify-content-between align-items-center  mb-5  ">
+                <div class="mt-5 mt-md-0">
+                    <h5 class="display-8 text-primary fw-bold">Drive and fleet soförszolgálati munkalap</h5>
+                    <p class="m-0 smaller-font">Order ID: {{loadedRide?.orderId}}</p>
+                    <p class="m-0 smaller-font">Ride ID: {{loadedRide?.rideId}}</p>
+                    <button (click)="downloadPdf()" cButton>Download PDF</button>
+                </div>
+
+            </div>
+
+            <div class="bg-light rounded-5 p-0">
+                <div class="d-md-flex justify-content-between">
+                    <div>
+                        <p class="text-primary fw-bold">Fuvar adatok</p>
+                        <h6>Rendszám: <b>{{loadedRide?.order?.plateNr}}</b></h6>
+                        <ul class="list-unstyled">
+                            <li class="smaller-font">Sofőr: <b>{{loadedRide!.relRideDrivers[0]!.driver.driverRealName}}</b></li>
+                            <li class="smaller-font">Felvétel helye: <b>{{loadedRide?.startLocationZip}}, {{loadedRide?.startLocationCity}} {{loadedRide?.startLocationAddress}}</b></li>
+                            <li class="smaller-font">Leadás helye: <b>{{loadedRide?.finishLocationZip}}, {{loadedRide?.finishLocationCity}} {{loadedRide?.finishLocationAddress}}</b></li>
+                            <li class="smaller-font">Teljesítve: <b>{{formatDate(loadedRide?.modDate, 'long')}}</b></li>
+                        </ul>
                     </div>
+                    <div class="text-md-end mt-5 mt-md-0">
+                        <p class="text-primary fw-bold">Partner adatok</p>
+                        <h5>{{loadedRide?.order?.partner?.partnerName}}</h5>
+                        <ul class="list-unstyled">
+                            <li>{{loadedRide?.order?.partner?.partnerMail}}</li>
+                            <li>{{loadedRide?.order?.partner?.partnerPhone}}</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="d-md-flex justify-content-between mt-4">
+
+                </div>
+            </div>
+            <hr>
+            <h5 class="fw-bold mb-4">Műszaki adatok</h5>
+            <table class="table border my-5">
+                <thead>
+                <tr class="bg-primary">
+                    <th scope="col" class="text-white">Paraméter neve</th>
+                    <th scope="col" class="text-white">Érték</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let surv of loadedRide?.rideSurveyResults">
+                    <td>{{surv.stype.typeName}}</td>
+                    <td>{{surv.survValue}}</td>
+                </tr>
+                </tbody>
+            </table>
 
 
-                </c-card-body>
-            </c-card>
-        </c-tab-pane>
-        <c-tab-pane class="p-3">
-            <c-card *ngIf="loadedRide != undefined">
-                <c-card-body>
-                    <h5 cCardTitle>Fényképek</h5>
-                    <hr>
+
+            <div>
+                <div class="row mt-4 mb-5">
+                    <h5 class="fw-bold mb-4">Fényképek</h5>
+
                     <gallery [items]="galeryItems" [thumb]="true"></gallery>
-                </c-card-body>
-            </c-card>
-        </c-tab-pane>
-    </c-tab-content>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </section>
+
 </div>

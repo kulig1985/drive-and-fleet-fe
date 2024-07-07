@@ -2,7 +2,9 @@ import {Component, computed, DestroyRef, inject, Input, ViewChild} from '@angula
 import {
   AvatarComponent,
   BadgeComponent,
-  BreadcrumbRouterComponent, ButtonDirective, ColComponent,
+  BreadcrumbRouterComponent,
+  ButtonDirective,
+  ColComponent,
   ColorModeService,
   ContainerComponent,
   DropdownComponent,
@@ -10,17 +12,26 @@ import {
   DropdownHeaderDirective,
   DropdownItemDirective,
   DropdownMenuDirective,
-  DropdownToggleDirective, FormControlDirective, FormDirective, GutterDirective,
+  DropdownToggleDirective,
+  FormCheckComponent,
+  FormCheckInputDirective, FormCheckLabelDirective,
+  FormControlDirective,
+  FormDirective,
+  GutterDirective,
   HeaderComponent,
   HeaderNavComponent,
-  HeaderTogglerDirective, InputGroupComponent, InputGroupTextDirective,
+  HeaderTogglerDirective,
+  InputGroupComponent,
+  InputGroupTextDirective,
   NavItemComponent,
   NavLinkDirective,
   ProgressBarDirective,
-  ProgressComponent, RowComponent,
+  ProgressComponent,
+  RowComponent,
   SidebarToggleDirective,
   TextColorDirective,
-  ThemeDirective, ToasterPlacement
+  ThemeDirective,
+  ToasterPlacement
 } from '@coreui/angular';
 import {NgForOf, NgIf, NgStyle, NgTemplateOutlet} from '@angular/common';
 import {ActivatedRoute, NavigationEnd, Router, RouterLink, RouterLinkActive} from '@angular/router';
@@ -49,7 +60,7 @@ import {TriggerService} from "../../../shared/trigger.service";
   selector: 'app-default-header',
   templateUrl: './default-header.component.html',
   standalone: true,
-  imports: [ContainerComponent, HeaderTogglerDirective, SidebarToggleDirective, IconDirective, HeaderNavComponent, NavItemComponent, NavLinkDirective, RouterLink, RouterLinkActive, NgTemplateOutlet, BreadcrumbRouterComponent, ThemeDirective, DropdownComponent, DropdownToggleDirective, TextColorDirective, AvatarComponent, DropdownMenuDirective, DropdownHeaderDirective, DropdownItemDirective, BadgeComponent, DropdownDividerDirective, ProgressBarDirective, ProgressComponent, NgStyle, FormDirective, FormControlDirective, ButtonDirective, FormsModule, RowComponent, GutterDirective, ColComponent, InputGroupTextDirective, InputGroupComponent, NgIf, DxFormModule, DxPopupModule, DxiItemModule, DxiTabModule, DxiValidationRuleModule, DxoLabelModule, NgForOf]
+  imports: [ContainerComponent, HeaderTogglerDirective, SidebarToggleDirective, IconDirective, HeaderNavComponent, NavItemComponent, NavLinkDirective, RouterLink, RouterLinkActive, NgTemplateOutlet, BreadcrumbRouterComponent, ThemeDirective, DropdownComponent, DropdownToggleDirective, TextColorDirective, AvatarComponent, DropdownMenuDirective, DropdownHeaderDirective, DropdownItemDirective, BadgeComponent, DropdownDividerDirective, ProgressBarDirective, ProgressComponent, NgStyle, FormDirective, FormControlDirective, ButtonDirective, FormsModule, RowComponent, GutterDirective, ColComponent, InputGroupTextDirective, InputGroupComponent, NgIf, DxFormModule, DxPopupModule, DxiItemModule, DxiTabModule, DxiValidationRuleModule, DxoLabelModule, NgForOf, FormCheckComponent, FormCheckInputDirective, FormCheckLabelDirective]
 })
 export class DefaultHeaderComponent  extends HeaderComponent  {
 
@@ -70,6 +81,9 @@ export class DefaultHeaderComponent  extends HeaderComponent  {
   validPartnerList : PartnerDTO[];
   driverList : DriverDTO[];
   iconsAll = { cilCheck, cilPlus, cilArrowRight, cilChartPie, cilSpeedometer, cilArrowBottom, cilArrowTop, cilCarAlt, cilReload, cilOptions, cilClipboard, cilFilter};
+
+  ownRideValue = false;
+  closeRideValue = true;
 
   readonly colorModes = [
     { name: 'light', text: 'Light', icon: 'cilSun' },
@@ -120,6 +134,16 @@ export class DefaultHeaderComponent  extends HeaderComponent  {
 
   onPlateSearchTextChange(newValue: string) {
     this.triggerService.triggerSearchTextChanged(newValue);
+
+  }
+
+  onOwnRideChange(newValue: any) {
+    this.triggerService.triggerOwnRideValueChanged(newValue);
+
+  }
+
+  onClosedRideChange(newValue: any) {
+    this.triggerService.triggerClosedRideValueChanged(newValue);
 
   }
 

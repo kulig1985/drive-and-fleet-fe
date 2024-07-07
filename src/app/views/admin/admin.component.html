@@ -1,9 +1,82 @@
 
 
-<dx-data-grid [dataSource]="allRidesList" [showBorders]="true" [showRowLines]="true" [columnHidingEnabled]="true">
+<dx-data-grid
+        [dataSource]="allRidesList"
+        [showBorders]="true"
+        [showRowLines]="true"
+        [rowAlternationEnabled]="true"
+        height="700"
+        *ngIf="!isLoading"
+        (onExporting)="onExporting($event)"
+>
+    <dxo-group-panel [visible]="false"></dxo-group-panel>
+    <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+
+    <dxi-column caption="ID" dataField="orderId"
+                [allowEditing]="false"
+                [allowFiltering]="true"
+                [allowResizing]="true"
+                [width]="50"
+    >
+
+    </dxi-column>
+    <dxi-column caption="Rendszám" dataField="order.plateNr"
+                [allowEditing]="false"
+                [allowFiltering]="true"
+                [allowResizing]="true"
+                [groupIndex]="0">
+    </dxi-column>
+    <dxi-column caption="Fevétel város" dataField="startLocationCity"
+                [allowEditing]="false"
+                [allowFiltering]="true"
+                [allowResizing]="true">
+    </dxi-column>
+
+    <dxi-column caption="Fevétel cím" dataField="startLocationAddress"
+                [allowEditing]="false"
+                [allowFiltering]="true"
+                [allowResizing]="true">
+    </dxi-column>
+    <dxi-column caption="Fevétel város" dataField="finishLocationCity"
+                [allowEditing]="false"
+                [allowFiltering]="true"
+                [allowResizing]="true">
+    </dxi-column>
+    <dxi-column caption="Fevétel cím" dataField="finishLocationAddress"
+                [allowEditing]="false"
+                [allowFiltering]="true"
+                [allowResizing]="true">
+    </dxi-column>
+    <dxi-column caption="Létrehozva" dataField="crDate"
+                dataType="date"
+                [format]="{ type: 'MM.dd HH:mm:ss'}"
+                [allowEditing]="false"
+                [allowFiltering]="true" [allowResizing]="true">
+    </dxi-column>
+    <dxi-column caption="Teljesítve" dataField="modDate"
+                dataType="date"
+                [format]="{ type: 'MM.dd HH:mm:ss'}"
+                [allowEditing]="false"
+                [allowFiltering]="true" [allowResizing]="true">
+
+    </dxi-column>
 
     <dxo-header-filter [visible]="true" [allowSearch]="true"></dxo-header-filter>
     <dxo-sorting mode="multiple"></dxo-sorting>
     <dxo-column-chooser [enabled]="true" mode="select"></dxo-column-chooser>
+    <dxo-export [enabled]="true"></dxo-export>
+
 
 </dx-data-grid>
+
+@if (isLoading) {
+    <div class="centered-div">
+        <dx-load-indicator
+                id="large-indicator"
+                height="60"
+                width="60"
+        ></dx-load-indicator>
+        <br>
+        Kérlek várj..
+    </div>
+}

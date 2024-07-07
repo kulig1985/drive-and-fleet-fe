@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Renderer2} from '@angular/core';
 import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
 import {Title} from "@angular/platform-browser";
 import {IconSetService} from "@coreui/icons-angular";
@@ -13,10 +13,14 @@ import {iconSubset} from "./icons/icon-subset";
 })
 export class AppComponent implements OnInit {
   title = 'Drive and fleet admin';
+
+
   constructor(
       private router: Router,
       private titleService: Title,
-      private iconSetService: IconSetService
+      private iconSetService: IconSetService,
+      private renderer: Renderer2
+
   ) {
     this.titleService.setTitle(this.title);
     // iconSet singleton
@@ -24,10 +28,14 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
     this.router.events.subscribe((evt) => {
       if (!(evt instanceof NavigationEnd)) {
         return;
       }
     });
   }
+
+
+
 }

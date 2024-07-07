@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterLink} from "@angular/router";
 import {
+  ButtonDirective,
   CardBodyComponent,
   CardComponent, CardSubtitleDirective, CardTextDirective, CardTitleDirective,
   ColComponent,
@@ -18,6 +19,7 @@ import {CommonModule, DatePipe, NgForOf} from "@angular/common";
 import {Gallery, GalleryItem, GalleryModule, ImageItem} from "ng-gallery";
 import {ViewRideService} from "./view-ride.service";
 import {DxLoadIndicatorModule} from "devextreme-angular";
+import {saveAs} from "file-saver";
 
 @Component({
   selector: 'app-view-ride',
@@ -48,7 +50,8 @@ import {DxLoadIndicatorModule} from "devextreme-angular";
     TabContentRefDirective,
     NavLinkDirective,
     TabContentComponent,
-    TabPaneComponent
+    TabPaneComponent,
+    ButtonDirective
   ],
   templateUrl: './view-ride.component.html',
   styleUrl: './view-ride.component.scss'
@@ -60,6 +63,7 @@ export class ViewRideComponent implements OnInit{
   icons = { cilArrowLeft, cilArrowThickFromRight};
   galeryItems: GalleryItem[] = [];
   activeTab: number = 0;
+  isLoading= false;
 
   constructor(private route: ActivatedRoute,
               private daoService: DaoService,
@@ -72,6 +76,8 @@ export class ViewRideComponent implements OnInit{
     this.activeTab = tabIndex;
   }
   ngOnInit(): void {
+
+    this.isLoading = true;
 
     this.route.queryParams.subscribe(params => {
       this.rideId = +params['rideId'];   // use + to convert to number
@@ -105,9 +111,12 @@ export class ViewRideComponent implements OnInit{
             })
           }
 
+          this.isLoading = false;
+
         },
         error: (error : any) => {
           console.error('findRideById error: ', error)
+          this.isLoading = false;
         }
       })
 
@@ -125,6 +134,25 @@ export class ViewRideComponent implements OnInit{
         return this.datePipe.transform(dateString, 'yyyy.MM.dd HH:mm');
     }
 
+  }
+
+  downloadPdf() {
+    this.isLoading = true;
+
+    this.viewRideService.downloadPdf(this.rideId!).subscribe({
+      next: (downloadResponse : any) => {
+
+        let file_name = this.rideId! + "_summary.pdf";
+        saveAs(downloadResponse, file_name);
+
+        this.isLoading = false;
+
+      },
+      error: (error : any) => {
+        console.error('downloadPdf error: ', error);
+        this.isLoading = false;
+      }
+    })
   }
 
   protected readonly JSON = JSON;

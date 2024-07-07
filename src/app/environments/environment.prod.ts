@@ -13,5 +13,7 @@ export const environment = {
     downloadPicture: "api/downloadPicture",
     findAllRide: "api/dao/findAllRide",
     modifyDriverForRide: "api/modifyDriverForRide",
+    findAllZipCity: "api/dao/findAllZipCity",
+    downloadPdf: "api/generatePdfByRideId"
 
 }

@@ -16,4 +16,11 @@ export class ViewRideService {
     let params = new HttpParams().set('fileId', fileId);
     return this.httpClient.get(environment.downloadPicture, {params: params, responseType: 'blob' })
   }
+
+  downloadPdf(rideId: number): Observable<Blob> {
+    let params = new HttpParams().set('rideId', rideId);
+    return this.httpClient.get(environment.downloadPdf, {params: params, responseType: 'blob' });
+  }
+
+
 }

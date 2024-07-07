@@ -94,8 +94,14 @@
                                     </dxi-item>
                                     <dxi-item
                                             [dataField]="'rides[' + i + '].startLocationZip'"
-                                            editorType="dxNumberBox"
-                                            hint="1032"
+                                            editorType="dxLookup"
+                                            [editorOptions]="{
+                                                       dataSource : zipCityList,
+                                                       valueExpr: 'zip',
+                                                       onValueChanged: zipChanged('start', i),
+                                                       displayExpr: 'zip',
+                                                       fullScreen: false,
+                                                       dropDownOptions: {fullScreen: false}}"
                                     >
                                         <dxi-validation-rule type="required" message="Add meg a felvétel irányitószámot!"/>
                                         <dxo-label text="Felvétel irsz."> </dxo-label>
@@ -114,8 +120,14 @@
                                     </dxi-item>
                                     <dxi-item
                                             [dataField]="'rides[' + i + '].finishLocationZip'"
-                                            editorType="dxNumberBox"
-                                            hint="1032"
+                                            editorType="dxLookup"
+                                            [editorOptions]="{
+                                                       dataSource : zipCityList,
+                                                       valueExpr: 'zip',
+                                                       onValueChanged: zipChanged('finish', i),
+                                                       displayExpr: 'zip',
+                                                       fullScreen: false,
+                                                       dropDownOptions: {fullScreen: false}}"
                                     >
                                         <dxo-label text="Leadás irsz."> </dxo-label>
                                         <dxi-validation-rule type="required" message="Add meg a leadás irányítószámot!"/>

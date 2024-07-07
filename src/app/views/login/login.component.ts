@@ -35,6 +35,7 @@ export class LoginComponent implements OnInit{
     driverName: string;
     loginError= false;
     loaderVisible = false;
+    loginErrorMessage: any;
 
   constructor(private authService: AuthService, private router: Router) { }
 
@@ -48,6 +49,7 @@ export class LoginComponent implements OnInit{
                 },
                 error : (error : any) => {
                     console.error('login error: ', error)
+
                 }
             })
     }
@@ -69,7 +71,9 @@ export class LoginComponent implements OnInit{
                 error : (error : any) => {
                     console.error('generateJwt ERROR: ', error)
                     this.loaderVisible = false;
+                    this.loginErrorMessage = JSON.stringify(error);
                     this.loginError = true;
+
                 }
             })
 
